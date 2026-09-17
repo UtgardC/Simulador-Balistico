@@ -8,7 +8,7 @@ namespace Ballistics
     public class BallisticHUD : MonoBehaviour
     {
         public BallisticSession session;
-        private Slider angle, impulse;
+        private Slider angle, horizontalAngle, impulse;
         private DropdownField mass;
         private Button fire, reset;
         private Label liveTelemetry;
@@ -19,16 +19,18 @@ namespace Ballistics
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
             angle = root.Q<Slider>("angle");
+            horizontalAngle = root.Q<Slider>("horizontal-angle");
             impulse = root.Q<Slider>("impulse");
             mass = root.Q<DropdownField>("mass");
             fire = root.Q<Button>("fire"); reset = root.Q<Button>("reset");
             liveTelemetry = root.Q<Label>("live-telemetry");
             history = root.Q<ScrollView>("history");
             controls = root.Q("controls");
-            angle.value = session.angle; impulse.value = session.impulse;
+            angle.value = session.angle; horizontalAngle.value = session.horizontalAngle; impulse.value = session.impulse;
             mass.choices = new List<string> { "0,5 kg", "1 kg", "2 kg" };
             mass.index = session.mass < 0.75f ? 0 : session.mass > 1.5f ? 2 : 1;
             angle.RegisterValueChangedCallback(e => session.angle = e.newValue);
+            horizontalAngle.RegisterValueChangedCallback(e => session.horizontalAngle = e.newValue);
             impulse.RegisterValueChangedCallback(e => session.impulse = e.newValue);
             mass.RegisterValueChangedCallback(e => session.mass = mass.index == 0 ? 0.5f : mass.index == 1 ? 1 : 2);
             fire.clicked += session.Fire; reset.clicked += session.ResetRange;

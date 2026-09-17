@@ -193,73 +193,58 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4056143287869845764, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_Name
-      value: Objetivos (vista previa del editor)
+      value: Objetivos - plantilla editable
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12
+      value: 14.535718
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.7653246
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 1.7655417
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.44936383
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.38233557
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: -0.3784895
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: 0.7131882
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: 11.318
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: -64.565
       objectReference: {fileID: 0}
     - target: {fileID: 7620924682269272675, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 108.408
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 4056143287869845764, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 388781083}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
 --- !u!1 &388781082 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4056143287869845764, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
   m_PrefabInstance: {fileID: 388781081}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &388781083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 388781082}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8603b74c6f232334d8a3e46f38ba62d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ballistics.EditorTargetPreview
 --- !u!1 &763605173
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,12 +426,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ballistics.BallisticSession
   projectilePrefab: {fileID: 1989168170124290603, guid: bf1b6f59e67fe834aadb96da3699eb68, type: 3}
-  structurePrefab: {fileID: 4056143287869845764, guid: 4fa95421f87abe245a35f077dcd7e7e8, type: 3}
+  structureTemplate: {fileID: 388781082}
   barrelPivot: {fileID: 269106783}
   muzzle: {fileID: 1852797812}
   preview: {fileID: 763605174}
-  targetPosition: {x: 12, y: 0, z: 0}
   angle: 30
+  horizontalAngle: 0
   impulse: 12
   mass: 1
 --- !u!4 &850577354

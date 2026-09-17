@@ -20,7 +20,7 @@ namespace Ballistics
     {
         public int attempt;
         public string timestampUtc;
-        public float angleDegrees, launchImpulseNs, massKg, duration;
+        public float angleDegrees, horizontalAngleDegrees, launchImpulseNs, massKg, duration;
         public string endReason;
         public int piecesDown;
         public bool hitTarget;

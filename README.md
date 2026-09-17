@@ -9,7 +9,7 @@ Proyecto educativo 3D con Rigidbody, FixedJoint y una interfaz hecha con UI Tool
 1. Abrir esta carpeta desde Unity Hub con la versión indicada.
 2. Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` y presionar **Play**.
 3. Usar Game View en **16:9**, preferentemente 1280 × 720 o mayor.
-4. Ajustar ángulo (5–75°), fuerza de disparo expresada como impulso (5–60 N·s) y masa (0,5 / 1 / 2 kg). Los sliders también tienen entrada numérica.
+4. Ajustar elevación (5–75°), ángulo horizontal (−45–45°), fuerza de disparo expresada como impulso (5–60 N·s) y masa (0,5 / 1 / 2 kg). Los sliders también tienen entrada numérica.
 5. Pulsar **Disparar**. La simulación observa las colisiones y espera a que los cuerpos se detengan, con un máximo de 12 segundos.
 6. Consultar el historial plegable y pulsar **Nuevo intento** para reconstruir los objetivos. El botón también puede interrumpir un proyectil en vuelo.
 
@@ -46,6 +46,10 @@ El código conserva internamente los eventos `OnCollisionEnter` del proyectil, i
 | `Tools` | Generación y verificación automatizada mediante Unity Pipeline |
 
 La escena anterior permanece en `Assets/Scenes`. Si había cambios sin guardar, se preservaron en `BeforeBallisticSetup.unity`.
+
+### Acomodar los objetivos
+
+En la jerarquía de `BallisticLab`, mover o rotar **Objetivos - plantilla editable**. Esa transformación —incluido el giro sobre Y— se conserva al entrar en Play y se usa para reconstruir cada intento. También se pueden ajustar sus bloques hijos, siempre que se mantengan coherentes las conexiones de sus FixedJoint. El ángulo horizontal del disparo permite apuntar a objetivos desplazados en profundidad.
 
 Para regenerar los assets iniciales: menú **Ballistics → Crear o reconstruir escena**. Esto restablece la escena, materiales y prefabs del simulador; guardar antes cualquier personalización. No es necesario ejecutar el generador para jugar un clon del repositorio.
 

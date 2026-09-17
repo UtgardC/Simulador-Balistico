@@ -102,17 +102,17 @@ namespace Ballistics.Editor
 
             var controller = new GameObject("Simulador").AddComponent<BallisticSession>();
             controller.projectilePrefab = projectilePrefab.GetComponent<Projectile>();
-            controller.structurePrefab = targetPrefab; controller.barrelPivot = pivot; controller.muzzle = muzzle;
+            controller.barrelPivot = pivot; controller.muzzle = muzzle;
             var line = new GameObject("Trayectoria ideal").AddComponent<LineRenderer>();
             line.sharedMaterial = trailMat; line.startWidth = 0.025f; line.endWidth = 0.025f;
             line.useWorldSpace = true; line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             line.receiveShadows = false; controller.preview = line;
 
-            // Editor-only preview: the session instantiates a fresh prefab in Play mode.
+            // This visible scene object is the editable template cloned for every attempt.
             var preview = (GameObject)PrefabUtility.InstantiatePrefab(targetPrefab);
-            preview.name = "Objetivos (vista previa del editor)";
-            preview.transform.position = controller.targetPosition;
-            preview.AddComponent<EditorTargetPreview>();
+            preview.name = "Objetivos - plantilla editable";
+            preview.transform.position = new Vector3(12, 0, 0);
+            controller.structureTemplate = preview;
 
             var camera = new GameObject("Main Camera").AddComponent<Camera>(); camera.tag = "MainCamera";
             camera.transform.position = new Vector3(7.2f, 9.5f, -27);

@@ -13,12 +13,13 @@ public static class VerifyControls
         session.ResetRange();
         int initialHistoryCount = session.ShotHistory.Count;
         var angle = root.Q<Slider>("angle");
+        var horizontalAngle = root.Q<Slider>("horizontal-angle");
         var impulse = root.Q<Slider>("impulse");
         var mass = root.Q<DropdownField>("mass");
-        angle.value = 45; impulse.value = 15; mass.index = 0;
-        Check(session.angle == 45 && session.impulse == 15 && session.mass == 0.5f, "Enlace de controles incorrecto.");
+        angle.value = 45; horizontalAngle.value = 20; impulse.value = 15; mass.index = 0;
+        Check(session.angle == 45 && session.horizontalAngle == 20 && session.impulse == 15 && session.mass == 0.5f, "Enlace de controles incorrecto.");
         mass.index = 2; Check(session.mass == 2, "Masa pesada incorrecta.");
-        angle.value = 30; impulse.value = 12; mass.index = 1;
+        angle.value = 30; horizontalAngle.value = 0; impulse.value = 12; mass.index = 1;
         Submit(root.Q<Button>("fire"));
         Check(session.IsRunning && !root.Q<Button>("fire").enabledInHierarchy && !angle.enabledInHierarchy, "Disparo o bloqueo de controles incorrecto.");
         Check(root.Q<Button>("reset").enabledInHierarchy, "Nuevo intento debe estar habilitado durante el vuelo.");

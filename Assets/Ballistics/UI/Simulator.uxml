@@ -5,6 +5,8 @@
             <ui:VisualElement name="controls">
                 <ui:Label text="Ángulo de elevación (°)" class="field-label" />
                 <ui:Slider name="angle" low-value="5" high-value="75" show-input-field="true" />
+                <ui:Label text="Ángulo horizontal (°)" class="field-label" />
+                <ui:Slider name="horizontal-angle" low-value="-45" high-value="45" show-input-field="true" />
                 <ui:Label text="Fuerza de disparo / impulso (N·s)" class="field-label" />
                 <ui:Slider name="impulse" low-value="5" high-value="60" show-input-field="true" />
                 <ui:Label text="Masa del proyectil" class="field-label" />
