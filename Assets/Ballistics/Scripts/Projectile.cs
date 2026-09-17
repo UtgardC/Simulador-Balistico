@@ -8,6 +8,14 @@ namespace Ballistics
         private BallisticSession session;
         private float launchTime;
 
+        private void Awake()
+        {
+            var trail = GetComponent<TrailRenderer>();
+            if (trail == null) return;
+            trail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            trail.receiveShadows = false;
+        }
+
         public void Launch(BallisticSession owner, Vector3 direction, float impulse, float mass)
         {
             session = owner;

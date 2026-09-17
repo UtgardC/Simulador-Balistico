@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Ballistics
@@ -17,9 +17,9 @@ namespace Ballistics
         public float mass = 1;
 
         public bool IsRunning { get; private set; }
+        public bool IsRangeReady { get; private set; }
         public ShotRecord LastShot { get; private set; }
-        public string SaveStatus { get; private set; } = "Los resultados se guardan al terminar cada tiro.";
-        public string RecordsDirectory => Path.Combine(Application.persistentDataPath, "Shots");
+        public IReadOnlyList<ShotRecord> ShotHistory => shotHistory;
         public float Elapsed => IsRunning ? Time.fixedTime - startedAt : 0;
         public int PiecesDown
         {
@@ -36,12 +36,19 @@ namespace Ballistics
         private Projectile projectile;
         private Rigidbody projectileBody;
         private ShotRecord current;
+        private readonly List<ShotRecord> shotHistory = new List<ShotRecord>();
         private int attempt;
         private float startedAt, firstImpactAt, quietTime;
         private bool pendingLaunch;
         private readonly Vector3[] previewPoints = new Vector3[70];
 
-        private void Start() { Application.runInBackground = true; ResetRange(); }
+        private void Start()
+        {
+            Application.runInBackground = true;
+            preview.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            preview.receiveShadows = false;
+            ResetRange();
+        }
 
         private void Update()
         {
@@ -62,9 +69,15 @@ namespace Ballistics
 
         public void Fire()
         {
-            if (IsRunning || LastShot != null) return;
+            if (IsRunning || !IsRangeReady) return;
             IsRunning = true;
+            IsRangeReady = false;
             pendingLaunch = true;
+            startedAt = Time.fixedTime;
+            firstImpactAt = -1;
+            quietTime = 0;
+            current = new ShotRecord { attempt = ++attempt, timestampUtc = DateTime.UtcNow.ToString("O"),
+                angleDegrees = angle, launchImpulseNs = impulse, massKg = mass };
             preview.enabled = false;
             Changed?.Invoke();
         }
@@ -75,11 +88,6 @@ namespace Ballistics
             if (pendingLaunch)
             {
                 pendingLaunch = false;
-                startedAt = Time.fixedTime;
-                firstImpactAt = -1;
-                quietTime = 0;
-                current = new ShotRecord { attempt = ++attempt, timestampUtc = DateTime.UtcNow.ToString("O"),
-                    angleDegrees = angle, launchImpulseNs = impulse, massKg = mass };
                 barrelPivot.rotation = Quaternion.Euler(0, 0, angle);
                 projectile = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
                 projectileBody = projectile.GetComponent<Rigidbody>();
@@ -93,13 +101,13 @@ namespace Ballistics
                 quiet &= body.IsSleeping() || (body.linearVelocity.sqrMagnitude < 0.04f && body.angularVelocity.sqrMagnitude < 0.04f);
             }
             quietTime = quiet ? quietTime + Time.fixedDeltaTime : 0;
-            if (firstImpactAt >= 0 && Time.fixedTime - firstImpactAt >= 3 && quietTime >= 0.8f) Finish("En reposo");
-            else if (Elapsed >= 12) Finish("Tiempo máximo de observación (12 s)");
+            if (firstImpactAt >= 0 && Time.fixedTime - firstImpactAt >= 3 && quietTime >= 0.8f) CompleteShot("En reposo", true);
+            else if (Elapsed >= 12) CompleteShot("Tiempo máximo de observación (12 s)", true);
             else if (projectile.transform.position.y < -10 || projectile.transform.position.x > 65)
             {
                 // Allow time for the structure to finish falling even if the projectile leaves the range.
                 if (firstImpactAt < 0) firstImpactAt = Time.fixedTime;
-                if (Time.fixedTime - firstImpactAt >= 5) Finish("Fuera del campo");
+                if (Time.fixedTime - firstImpactAt >= 5) CompleteShot("Fuera del campo", true);
             }
         }
 
@@ -111,41 +119,37 @@ namespace Ballistics
             current.hitTarget |= impact.target;
         }
 
-        private void Finish(string reason)
+        private void CompleteShot(string reason, bool freezeBodies)
         {
+            if (current == null) return;
             current.duration = Elapsed;
             current.endReason = reason;
             current.piecesDown = PiecesDown;
-            current.score = current.piecesDown * 100 + (current.hitTarget ? 50 : 0);
             LastShot = current;
+            shotHistory.Insert(0, current);
             IsRunning = false;
-            // Freeze only after measuring, so the displayed report describes the final visible state.
-            projectileBody.isKinematic = true;
-            foreach (var piece in pieces) piece.GetComponent<Rigidbody>().isKinematic = true;
-            try
+            pendingLaunch = false;
+            if (freezeBodies)
             {
-                Directory.CreateDirectory(RecordsDirectory);
-                string filename = $"shot-{DateTime.UtcNow:yyyyMMdd-HHmmss-fff}-{current.attempt}-{Guid.NewGuid():N}.json";
-                File.WriteAllText(Path.Combine(RecordsDirectory, filename), JsonUtility.ToJson(current, true));
-                SaveStatus = "JSON guardado en: " + RecordsDirectory;
+                if (projectileBody != null) projectileBody.isKinematic = true;
+                foreach (var piece in pieces)
+                    if (piece != null) piece.GetComponent<Rigidbody>().isKinematic = true;
             }
-            catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
-            {
-                SaveStatus = "No se pudo guardar el JSON: " + exception.Message;
-                Debug.LogWarning(SaveStatus);
-            }
+            current = null;
             Changed?.Invoke();
         }
 
         public void ResetRange()
         {
-            if (IsRunning) return;
+            if (IsRunning) CompleteShot("Interrumpido", false);
             if (structure != null) { structure.SetActive(false); Destroy(structure); }
             if (projectile != null) { projectile.gameObject.SetActive(false); Destroy(projectile.gameObject); }
             structure = Instantiate(structurePrefab, targetPosition, Quaternion.identity);
             pieces = structure.GetComponentsInChildren<TargetPiece>();
-            LastShot = null;
             current = null;
+            projectile = null;
+            projectileBody = null;
+            IsRangeReady = true;
             preview.enabled = true;
             Changed?.Invoke();
         }

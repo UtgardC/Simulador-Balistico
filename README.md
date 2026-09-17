@@ -11,9 +11,9 @@ Proyecto educativo 3D con Rigidbody, FixedJoint y una interfaz hecha con UI Tool
 3. Usar Game View en **16:9**, preferentemente 1280 × 720 o mayor.
 4. Ajustar ángulo (5–75°), fuerza de disparo expresada como impulso (5–60 N·s) y masa (0,5 / 1 / 2 kg). Los sliders también tienen entrada numérica.
 5. Pulsar **Disparar**. La simulación observa las colisiones y espera a que los cuerpos se detengan, con un máximo de 12 segundos.
-6. Leer el reporte y pulsar **Nuevo intento / reconstruir**. Los parámetros se conservan; los objetivos se regeneran y la puntuación vuelve a cero.
+6. Consultar el historial plegable y pulsar **Nuevo intento** para reconstruir los objetivos. El botón también puede interrumpir un proyectil en vuelo.
 
-Solo hace falta el mouse. Durante el tiro los controles quedan bloqueados. Al concluir, los cuerpos se congelan para conservar el estado que corresponde al reporte; el siguiente intento vuelve a usar cuerpos dinámicos.
+Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botón de disparo, pero **Nuevo intento** permanece habilitado. Al concluir, los cuerpos se congelan hasta reconstruir el campo.
 
 ## Física y evaluación
 
@@ -22,16 +22,16 @@ Solo hace falta el mouse. Durante el tiro los controles quedan bloqueados. Al co
 - Proyectil esférico con Rigidbody, SphereCollider, detección continua e interpolación. La línea previa es orientativa: una parábola ideal sin colisiones; el disparo real lo resuelve PhysX.
 - Nueve bloques de 0,8 kg en tres columnas, con Rigidbody y BoxCollider. Cada columna usa FixedJoints entre bloques y un anclaje cinemático en la base. Resistencia de rotura: 65 N y 45 N·m. Las piezas empiezan dinámicas, incluso antes del disparo.
 - Una pieza cuenta como derribada si, al cerrar el intento, su centro está a más de **0,65 m** de la posición inicial o su rotación difiere más de **35°**. Romper un joint por sí solo no suma puntos.
-- **Puntuación = 100 × piezas derribadas + 50 si el proyectil colisionó con algún objetivo.** Máximo: 950 puntos. También se consideran impactos después de rodar o rebotar.
+- También se registran impactos después de que el proyectil ruede o rebote.
 - Se esperan al menos tres segundos desde el primer impacto y 0,8 segundos de reposo de todos los cuerpos. Hay límites de tiempo y de salida del campo para que un tiro no bloquee el juego.
 
-## Reporte y datos
+## Telemetría e historial
 
-La interfaz muestra puntuación, piezas derribadas, duración de observación, tiempo hasta el primer impacto, objeto alcanzado, punto en coordenadas de mundo, magnitud de velocidad relativa e impulso de colisión. El primer impacto puede ser contra el suelo aunque después alcance un objetivo.
+La telemetría principal se limita al tiempo transcurrido y las piezas derribadas. Debajo se muestran los tiros de la sesión, con el más reciente arriba. Cada fila se abre o cierra al hacer clic y contiene la duración, las piezas derribadas y todos los impactos registrados: objeto y punto de contacto, tiempo de vuelo, velocidad relativa e impulso. La rueda del mouse desplaza la lista. La puntuación no se muestra.
 
-Cada intento completado escribe un JSON independiente en `Application.persistentDataPath/Shots`. La ruta efectiva aparece al pie de la pantalla. En Windows, con los ajustes actuales: `%USERPROFILE%/AppData/LocalLow/DefaultCompany/SimuladorBALISTICO/Shots/`.
+El historial vive en memoria y se reinicia al salir de Play Mode. No se crean archivos JSON. Si se pulsa **Nuevo intento** durante un disparo, se registra el resultado parcial como tiro interrumpido y el campo se reconstruye inmediatamente.
 
-El JSON contiene fecha UTC, número de intento de la sesión, parámetros de lanzamiento, duración, motivo de finalización, puntuación y **todos los eventos OnCollisionEnter del proyectil**, con tiempo transcurrido desde el lanzamiento y vectores de punto, velocidad relativa e impulso. No se contabilizan como impactos del proyectil las colisiones entre bloques. Cada archivo tiene un identificador único; reiniciar Play no sobreescribe intentos anteriores. Si falla la escritura, el error aparece en pantalla y el reporte se conserva en memoria.
+El código conserva internamente los eventos `OnCollisionEnter` del proyectil, incluidos el punto, la velocidad relativa y el impulso. Esos datos quedan disponibles para evaluación o ampliaciones, aunque la interfaz simplificada no los presenta.
 
 ## Organización
 
@@ -59,13 +59,13 @@ unity command --project-path . --timeout 58 run_script --file Tools/VerifyLab.cs
 unity command --project-path . editor_stop
 ```
 
-Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificación espera seis segundos sin disparar, comprueba nueve piezas y nueve joints intactos, ejecuta tres tiros y verifica telemetría, puntuación y escritura JSON. Las verificaciones producen archivos de tiro igual que el juego. No ejecutar dos verificaciones simultáneas.
+Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificación espera seis segundos sin disparar, comprueba nueve piezas y nueve joints intactos, ejecuta tres tiros y verifica la física, la telemetría y el orden del historial. No ejecutar dos verificaciones simultáneas.
 
 Los controles se pueden verificar manualmente variando cada slider y la masa, comprobando que la velocidad inicial y la trayectoria cambien, y que no sea posible disparar dos veces durante el mismo intento.
 
-La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de sliders, las tres masas, los botones mediante eventos de UI Toolkit, el bloqueo durante el tiro y la actualización del reporte.
+La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de sliders, las tres masas, el reinicio durante el vuelo y el historial con los tiros más recientes primero.
 
-Resultados de la verificación en Unity 6000.4.6f1: nueve piezas y nueve joints intactos tras seis segundos; tiros de 7 N·s / 1 kg, 12 N·s / 1 kg y 24 N·s / 2 kg a 30° con 0, 7 y 8 piezas derribadas, respectivamente (50, 750 y 850 puntos). Los resultados exactos pueden variar ligeramente entre plataformas por el solver físico.
+Resultados de la verificación en Unity 6000.4.6f1: nueve piezas y nueve joints intactos tras seis segundos; tiros de 7 N·s / 1 kg, 12 N·s / 1 kg y 24 N·s / 2 kg a 30° con 0, 7 y 8 piezas derribadas, respectivamente. Los resultados exactos pueden variar ligeramente entre plataformas por el solver físico.
 
 ## Git y entrega
 
@@ -75,5 +75,5 @@ Versionar `Assets/` (incluidos los `.meta`), `Packages/`, `ProjectSettings/`, `T
 
 **Enlace: pendiente de grabar y publicar.**
 
-Guion sugerido, 1–3 minutos: mostrar la interfaz y la estabilidad inicial; hacer un tiro a 30° / 7 N·s / 1 kg, otro a 30° / 12 N·s / 1 kg y otro a 30° / 24 N·s / 2 kg; mostrar los reportes y abrir uno de los JSON. Explicar que duplicar impulso y masa conserva la velocidad inicial pero aumenta el momento del proyectil. Sustituir este texto por el enlace real antes de entregar.
+Guion sugerido, 1–3 minutos: mostrar la interfaz y la estabilidad inicial; hacer un tiro a 30° / 7 N·s / 1 kg, otro a 30° / 12 N·s / 1 kg y otro a 30° / 24 N·s / 2 kg; desplegar algunas filas del historial y mostrar un reinicio durante el vuelo. Explicar que duplicar impulso y masa conserva la velocidad inicial pero aumenta el momento del proyectil. Sustituir este texto por el enlace real antes de entregar.
 

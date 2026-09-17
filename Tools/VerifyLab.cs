@@ -29,11 +29,10 @@ public static class VerifyLab
             while (session.IsRunning) { CheckDeadline(deadline); await Task.Delay(20); }
             var shot = session.LastShot;
             Require(shot != null && shot.impacts.Count > 0, "No se registraron impactos.");
-            Require(shot.score == shot.piecesDown * 100 + (shot.hitTarget ? 50 : 0), "Puntuación incorrecta.");
             Require(shot.impacts[0].flightTime > 0 && shot.impacts[0].impulse.magnitude > 0, "Telemetría vacía.");
-            Require(session.SaveStatus.StartsWith("JSON guardado"), "Fallo al guardar JSON.");
+            Require(session.ShotHistory.Count >= i + 1 && session.ShotHistory[0] == shot, "Historial incompleto o mal ordenado.");
             Require(i == 0 ? !shot.impacts[0].target && shot.piecesDown == 0 : shot.hitTarget && shot.piecesDown > 0, "Resultado físico inesperado.");
-            result += $"Tiro {i + 1}: {shot.launchImpulseNs} N·s, {shot.massKg} kg, objetivo={shot.hitTarget}, piezas={shot.piecesDown}, puntos={shot.score}, vuelo={shot.impacts[0].flightTime:F2}s.\n";
+            result += $"Tiro {i + 1}: {shot.launchImpulseNs} N·s, {shot.massKg} kg, objetivo={shot.hitTarget}, piezas={shot.piecesDown}, vuelo={shot.impacts[0].flightTime:F2}s.\n";
         }
         return result;
     }

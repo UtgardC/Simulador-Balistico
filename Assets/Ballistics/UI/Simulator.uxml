@@ -1,13 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="Simulator.uss" />
     <ui:VisualElement name="screen" picking-mode="Ignore">
-        <ui:VisualElement class="header" picking-mode="Ignore">
-            <ui:Label text="LAB / 01     FÍSICA APLICADA" class="eyebrow" />
-            <ui:Label text="Simulador balístico" class="title" />
-            <ui:Label text="Ángulo · impulso · masa" class="subtitle" />
-        </ui:VisualElement>
         <ui:VisualElement class="panel">
-            <ui:Label text="01 / CONFIGURACIÓN" class="eyebrow" />
             <ui:VisualElement name="controls">
                 <ui:Label text="Ángulo de elevación (°)" class="field-label" />
                 <ui:Slider name="angle" low-value="5" high-value="75" show-input-field="true" />
@@ -16,17 +10,12 @@
                 <ui:Label text="Masa del proyectil" class="field-label" />
                 <ui:DropdownField name="mass" />
             </ui:VisualElement>
-            <ui:Label name="launch" class="readout" />
             <ui:Button name="fire" text="DISPARAR  →" class="primary" />
-            <ui:Button name="reset" text="Nuevo intento / reconstruir" />
-            <ui:Label text="Más masa con el mismo impulso = menor velocidad inicial." class="hint" />
+            <ui:Button name="reset" text="NUEVO INTENTO" />
         </ui:VisualElement>
         <ui:VisualElement class="report-panel">
-            <ui:Label text="02 / TELEMETRÍA" class="eyebrow" />
-            <ui:Label name="status" class="status" />
-            <ui:Label name="summary" class="summary" />
-            <ui:Label name="report" class="report" />
+            <ui:Label name="live-telemetry" class="live-telemetry" />
+            <ui:ScrollView name="history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" />
         </ui:VisualElement>
-        <ui:Label name="storage" class="footer" />
     </ui:VisualElement>
 </ui:UXML>

@@ -29,7 +29,6 @@ namespace Ballistics.Editor
             var orange = Material("Target", new Color(0.96f, 0.54f, 0.22f));
             var blue = Material("TargetAlternate", new Color(0.17f, 0.64f, 0.70f));
             var mint = Material("Projectile", new Color(0.40f, 0.94f, 0.73f));
-            var marks = Material("Markings", new Color(0.38f, 0.53f, 0.60f));
             var trailMat = Material("Trajectory", new Color(0.4f, 0.85f, 0.74f), true);
             var contact = AssetDatabase.LoadAssetAtPath<PhysicsMaterial>("Assets/Ballistics/Materials/Contact.physicsMaterial");
             if (contact == null)
@@ -40,11 +39,6 @@ namespace Ballistics.Editor
 
             var ground = Cube("Suelo", new Vector3(12, -0.3f, 0), new Vector3(90, 0.6f, 16), groundMat);
             ground.GetComponent<Collider>().sharedMaterial = contact;
-            for (int i = -5; i <= 35; i += 5)
-            {
-                var mark = Cube($"Marca {i} m", new Vector3(i, 0.012f, -1.7f), new Vector3(0.045f, 0.02f, 1.0f), marks);
-                Object.DestroyImmediate(mark.GetComponent<Collider>());
-            }
             Cube("Base de lanzamiento", new Vector3(0, 0.35f, 0), new Vector3(1.8f, 0.7f, 1.5f), metal);
             var pivot = new GameObject("Pivote - ángulo").transform;
             pivot.position = new Vector3(0, 1.0f, 0);
@@ -69,6 +63,7 @@ namespace Ballistics.Editor
             var trail = ball.AddComponent<TrailRenderer>();
             trail.time = 2.5f; trail.startWidth = 0.09f; trail.endWidth = 0.01f;
             trail.sharedMaterial = trailMat; trail.minVertexDistance = 0.05f;
+            trail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; trail.receiveShadows = false;
             var projectilePrefab = PrefabUtility.SaveAsPrefabAsset(ball, "Assets/Ballistics/Prefabs/Projectile.prefab");
             Object.DestroyImmediate(ball);
 
@@ -110,7 +105,8 @@ namespace Ballistics.Editor
             controller.structurePrefab = targetPrefab; controller.barrelPivot = pivot; controller.muzzle = muzzle;
             var line = new GameObject("Trayectoria ideal").AddComponent<LineRenderer>();
             line.sharedMaterial = trailMat; line.startWidth = 0.025f; line.endWidth = 0.025f;
-            line.useWorldSpace = true; controller.preview = line;
+            line.useWorldSpace = true; line.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            line.receiveShadows = false; controller.preview = line;
 
             // Editor-only preview: the session instantiates a fresh prefab in Play mode.
             var preview = (GameObject)PrefabUtility.InstantiatePrefab(targetPrefab);
