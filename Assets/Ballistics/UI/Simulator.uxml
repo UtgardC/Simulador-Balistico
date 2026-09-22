@@ -1,34 +1,34 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="Simulator.uss" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Ballistics/UI/Simulator.uss?fileID=7433441132597879392&amp;guid=31eb3377aaa6d624abead6d5fc96957e&amp;type=3#Simulator"/>
     <ui:VisualElement name="screen" picking-mode="Ignore">
-        <ui:VisualElement class="panel">
+        <ui:VisualElement class="panel" style="width: 242px;">
             <ui:VisualElement name="controls">
-                <ui:Label text="Ángulo de elevación (°)" class="field-label" />
-                <ui:Slider name="angle" low-value="5" high-value="75" show-input-field="true" />
-                <ui:Label text="Ángulo horizontal (°)" class="field-label" />
-                <ui:Slider name="horizontal-angle" low-value="-45" high-value="45" show-input-field="true" />
-                <ui:Label text="Fuerza de disparo / impulso (N·s)" class="field-label" />
-                <ui:Slider name="impulse" low-value="0" high-value="60" show-input-field="true" />
-                <ui:Label text="Velocidad inicial (m/s)" class="field-label" />
-                <ui:Slider name="velocity" low-value="0" high-value="100" show-input-field="true" />
-                <ui:Label text="Masa del proyectil" class="field-label" />
+                <ui:Label text="Ángulo de elevación (°)" class="field-label"/>
+                <ui:Slider name="angle" low-value="5" high-value="75" show-input-field="true"/>
+                <ui:Label text="Ángulo horizontal (°)" class="field-label"/>
+                <ui:Slider name="horizontal-angle" low-value="-45" high-value="45" show-input-field="true"/>
+                <ui:Label text="Fuerza de disparo / impulso (N·s)" class="field-label"/>
+                <ui:Slider name="impulse" low-value="0" high-value="60" show-input-field="true"/>
+                <ui:Label text="Velocidad inicial (m/s)" class="field-label"/>
+                <ui:Slider name="velocity" low-value="0" high-value="100" show-input-field="true"/>
+                <ui:Label text="Masa del proyectil" class="field-label"/>
                 <ui:VisualElement class="mass-row">
-                    <ui:Slider name="mass-slider" low-value="0" high-value="28" class="mass-slider" />
-                    <ui:FloatField name="mass-input" class="mass-input" />
-                    <ui:Label text="kg" class="mass-unit" />
+                    <ui:Slider name="mass-slider" low-value="0" high-value="28" class="mass-slider"/>
+                    <ui:FloatField name="mass-input" class="mass-input"/>
+                    <ui:Label text="kg" class="mass-unit"/>
                 </ui:VisualElement>
-                <ui:Toggle name="preserve-velocity" text="Al cambiar masa: conservar impulso" class="preserve-switch" />
+                <ui:Toggle name="preserve-velocity" text="Al cambiar masa: conservar impulso" class="preserve-switch"/>
             </ui:VisualElement>
-            <ui:Button name="fire" text="DISPARAR  →" class="primary" />
-            <ui:Button name="reset" text="NUEVO INTENTO" />
+            <ui:Button name="fire" text="DISPARAR  →" class="primary"/>
+            <ui:Button name="reset" text="NUEVO INTENTO"/>
         </ui:VisualElement>
         <ui:VisualElement class="report-panel">
-            <ui:Label name="live-telemetry" class="live-telemetry" />
-            <ui:ScrollView name="history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" />
+            <ui:Label name="live-telemetry" class="live-telemetry"/>
+            <ui:ScrollView name="history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden"/>
         </ui:VisualElement>
         <ui:VisualElement class="camera-panel">
-            <ui:Label text="Ángulo de cámara (°)" class="field-label" />
-            <ui:Slider name="camera-angle" low-value="0" high-value="180" show-input-field="true" />
+            <ui:Label text="Ángulo de cámara (°)" class="field-label"/>
+            <ui:Slider name="camera-angle" low-value="0" high-value="180" show-input-field="true"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
