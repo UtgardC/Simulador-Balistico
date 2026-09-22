@@ -24,7 +24,9 @@ namespace Ballistics
         }
 
         public BallisticSession session;
+        public Transform cameraRotatingPivot;
         private Slider angle, horizontalAngle, impulse, velocity, massSlider;
+        private Slider cameraAngle;
         private FloatField massInput;
         private Toggle preserveVelocity;
         private Button fire, reset;
@@ -32,6 +34,7 @@ namespace Ballistics
         private ScrollView history;
         private VisualElement controls;
         private bool updatingLinkedControls;
+        private bool cameraAngleInitialized;
         private float linkedVelocity;
         private readonly List<MarkerButtonBinding> markerButtons = new List<MarkerButtonBinding>();
 
@@ -43,6 +46,7 @@ namespace Ballistics
             impulse = root.Q<Slider>("impulse");
             velocity = root.Q<Slider>("velocity");
             massSlider = root.Q<Slider>("mass-slider");
+            cameraAngle = root.Q<Slider>("camera-angle");
             massInput = root.Q<FloatField>("mass-input");
             preserveVelocity = root.Q<Toggle>("preserve-velocity");
             fire = root.Q<Button>("fire");
@@ -50,6 +54,19 @@ namespace Ballistics
             liveTelemetry = root.Q<Label>("live-telemetry");
             history = root.Q<ScrollView>("history");
             controls = root.Q("controls");
+
+            EnsureCameraPivot();
+            if (cameraRotatingPivot != null)
+            {
+                if (!cameraAngleInitialized)
+                {
+                    SetCameraAngle(67f);
+                    cameraAngleInitialized = true;
+                }
+                cameraAngle.SetValueWithoutNotify(cameraRotatingPivot.localEulerAngles.y);
+            }
+            else
+                cameraAngle.SetEnabled(false);
 
             massSlider.lowValue = 0;
             massSlider.highValue = MassSteps.Length - 1;
@@ -62,6 +79,7 @@ namespace Ballistics
             massSlider.RegisterValueChangedCallback(OnMassSliderChanged);
             massInput.RegisterValueChangedCallback(OnMassInputChanged);
             preserveVelocity.RegisterValueChangedCallback(OnPreserveVelocityChanged);
+            cameraAngle.RegisterValueChangedCallback(OnCameraAngleChanged);
             fire.clicked += session.Fire;
             reset.clicked += session.ResetRange;
             session.Changed += Refresh;
@@ -78,6 +96,7 @@ namespace Ballistics
             massSlider.UnregisterValueChangedCallback(OnMassSliderChanged);
             massInput.UnregisterValueChangedCallback(OnMassInputChanged);
             preserveVelocity.UnregisterValueChangedCallback(OnPreserveVelocityChanged);
+            cameraAngle.UnregisterValueChangedCallback(OnCameraAngleChanged);
             session.Changed -= Refresh;
             session.ImpactMarkersChanged -= RefreshMarkerButtons;
             fire.clicked -= session.Fire;
@@ -96,6 +115,38 @@ namespace Ballistics
 
         private void OnAngleChanged(ChangeEvent<float> evt) => session.angle = evt.newValue;
         private void OnHorizontalAngleChanged(ChangeEvent<float> evt) => session.horizontalAngle = evt.newValue;
+        private void OnCameraAngleChanged(ChangeEvent<float> evt) => SetCameraAngle(evt.newValue);
+
+        private void EnsureCameraPivot()
+        {
+            if (cameraRotatingPivot != null) return;
+            var existingPivot = GameObject.Find("CameraRotatingPivot");
+            if (existingPivot != null)
+            {
+                cameraRotatingPivot = existingPivot.transform;
+                return;
+            }
+
+            var mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogWarning("No se encontró Main Camera para el control de ángulo.");
+                return;
+            }
+
+            cameraRotatingPivot = new GameObject("CameraRotatingPivot").transform;
+            cameraRotatingPivot.position = Vector3.zero;
+            cameraRotatingPivot.rotation = Quaternion.Euler(0f, 67f, 0f);
+            mainCamera.transform.SetParent(cameraRotatingPivot, true);
+        }
+
+        private void SetCameraAngle(float degrees)
+        {
+            if (cameraRotatingPivot == null) return;
+            var rotation = cameraRotatingPivot.localEulerAngles;
+            rotation.y = Mathf.Clamp(degrees, 0f, 180f);
+            cameraRotatingPivot.localEulerAngles = rotation;
+        }
 
         private void OnImpulseChanged(ChangeEvent<float> evt)
         {

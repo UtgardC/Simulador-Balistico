@@ -1,7 +1,9 @@
 #screen { flex-grow: 1; color: rgb(229, 237, 244); }
-.panel, .report-panel { position: absolute; width: 230px; padding: 12px; background-color: rgba(15, 26, 38, 0.93); border-radius: 8px; border-width: 1px; border-color: rgb(47, 68, 83); }
+.panel, .report-panel, .camera-panel { position: absolute; width: 230px; padding: 12px; background-color: rgba(15, 26, 38, 0.93); border-radius: 8px; border-width: 1px; border-color: rgb(47, 68, 83); }
 .panel { top: 18px; left: 18px; }
 .report-panel { top: 18px; right: 18px; width: 345px; height: 360px; }
+.camera-panel { bottom: 18px; left: 18px; width: 242px; }
+.camera-panel .field-label { margin-top: 0; }
 .field-label { margin-top: 7px; margin-bottom: 3px; font-size: 12px; }
 Slider { height: 24px; }
 Slider .unity-base-slider__input { width: 45px; }

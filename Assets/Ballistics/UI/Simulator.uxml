@@ -26,5 +26,9 @@
             <ui:Label name="live-telemetry" class="live-telemetry" />
             <ui:ScrollView name="history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" />
         </ui:VisualElement>
+        <ui:VisualElement class="camera-panel">
+            <ui:Label text="Ángulo de cámara (°)" class="field-label" />
+            <ui:Slider name="camera-angle" low-value="0" high-value="180" show-input-field="true" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

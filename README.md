@@ -13,6 +13,8 @@ Proyecto educativo 3D con Rigidbody, FixedJoint y una interfaz hecha con UI Tool
 5. Pulsar **Disparar**. La simulación observa las colisiones y espera a que los cuerpos se detengan, con un máximo de 12 segundos.
 6. Consultar el historial plegable y pulsar **Nuevo intento** para reconstruir los objetivos. El botón también puede interrumpir un proyectil en vuelo.
 
+El slider de la esquina inferior izquierda gira la cámara entre 0° y 180° alrededor del eje Y de `CameraRotatingPivot`. Comienza en 67° y puede usarse incluso durante un tiro. Si el pivote aún no está guardado en la escena, se crea automáticamente al entrar en Play y se conserva la vista inicial de la cámara.
+
 Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botón de disparo, pero **Nuevo intento** permanece habilitado. Al concluir, los cuerpos se congelan hasta reconstruir el campo.
 
 Impulso y velocidad inicial permanecen vinculados mediante `velocidad = impulso / masa`. El selector inferior permite decidir qué conservar cuando cambia la masa: con **conservar impulso**, la velocidad se recalcula; con **conservar velocidad**, se recalcula el impulso necesario.

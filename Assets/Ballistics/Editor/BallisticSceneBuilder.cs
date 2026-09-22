@@ -117,6 +117,9 @@ namespace Ballistics.Editor
             var camera = new GameObject("Main Camera").AddComponent<Camera>(); camera.tag = "MainCamera";
             camera.transform.position = new Vector3(7.2f, 9.5f, -27);
             camera.transform.LookAt(new Vector3(7.2f, 4.0f, 0));
+            var cameraPivot = new GameObject("CameraRotatingPivot").transform;
+            cameraPivot.rotation = Quaternion.Euler(0f, 67f, 0f);
+            camera.transform.SetParent(cameraPivot, true);
             camera.orthographic = true; camera.orthographicSize = 10.5f;
             camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = new Color(0.055f, 0.09f, 0.14f);
             camera.gameObject.AddComponent<AudioListener>();
