@@ -34,4 +34,4 @@ Una esfera amarilla marca los impactos contra los bloques. En el registro, **Mos
 
 ## Video
 
-Enlace de YouTube pendiente de agregar.
+https://youtu.be/esqKGpsQuRk
