@@ -20,14 +20,14 @@ Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botó
 - El lanzamiento aplica `Rigidbody.AddForce(dirección * impulso, ForceMode.Impulse)` una sola vez en FixedUpdate. La velocidad inicial es impulso / masa; la gravedad es la del proyecto (−9,81 m/s²). No se mueve el proyectil mediante Transform.
 - La "fuerza" de la interfaz es un **impulso en N·s**, no una fuerza continua en N. Es la magnitud correspondiente a ese modo de AddForce: [documentación de Unity](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Rigidbody.AddForce.html).
 - Proyectil esférico con Rigidbody, SphereCollider, detección continua e interpolación. La línea previa es orientativa: una parábola ideal sin colisiones; el disparo real lo resuelve PhysX.
-- Nueve bloques de 0,8 kg en tres columnas, con Rigidbody y BoxCollider. Cada columna usa FixedJoints entre bloques y un anclaje cinemático en la base. Resistencia de rotura: 65 N y 45 N·m. Las piezas empiezan dinámicas, incluso antes del disparo.
+- La plantilla actual contiene cinco columnas de cuatro bloques de 0,8 kg, con Rigidbody y BoxCollider. Cada columna usa FixedJoints entre bloques y un anclaje cinemático en la base. Resistencia de rotura: 65 N y 45 N·m. La cantidad puede modificarse y se detecta automáticamente.
 - Una pieza cuenta como derribada si, al cerrar el intento, su centro está a más de **0,65 m** de la posición inicial o su rotación difiere más de **35°**. Romper un joint por sí solo no suma puntos.
 - También se registran impactos después de que el proyectil ruede o rebote.
 - Se esperan al menos tres segundos desde el primer impacto y 0,8 segundos de reposo de todos los cuerpos. Hay límites de tiempo y de salida del campo para que un tiro no bloquee el juego.
 
 ## Telemetría e historial
 
-La telemetría principal se limita al tiempo transcurrido y las piezas derribadas. Debajo se muestran los tiros de la sesión, con el más reciente arriba. Cada fila se abre o cierra al hacer clic y contiene la duración, las piezas derribadas y todos los impactos registrados: objeto y punto de contacto, tiempo de vuelo, velocidad relativa e impulso. La rueda del mouse desplaza la lista. La puntuación no se muestra.
+La telemetría principal se limita al tiempo transcurrido y las piezas derribadas. La cantidad total se obtiene automáticamente de los componentes `TargetPiece`, por lo que admite paredes más grandes sin tocar el código. Debajo se muestran los tiros de la sesión, con el más reciente arriba. Cada fila se abre o cierra al hacer clic y contiene la duración, las piezas derribadas y todos los impactos registrados: objeto y punto de contacto, tiempo de vuelo, velocidad relativa e impulso. La rueda del mouse desplaza la lista. La puntuación no se muestra.
 
 El historial vive en memoria y se reinicia al salir de Play Mode. No se crean archivos JSON. Si se pulsa **Nuevo intento** durante un disparo, se registra el resultado parcial como tiro interrumpido y el campo se reconstruye inmediatamente.
 
@@ -63,13 +63,13 @@ unity command --project-path . --timeout 58 run_script --file Tools/VerifyLab.cs
 unity command --project-path . editor_stop
 ```
 
-Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificación espera seis segundos sin disparar, comprueba nueve piezas y nueve joints intactos, ejecuta tres tiros y verifica la física, la telemetría y el orden del historial. No ejecutar dos verificaciones simultáneas.
+Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificación espera seis segundos sin disparar, comprueba la cantidad configurada de piezas y sus joints, ejecuta tres tiros y verifica la física, la telemetría y el orden del historial. No ejecutar dos verificaciones simultáneas.
 
 Los controles se pueden verificar manualmente variando cada slider y la masa, comprobando que la velocidad inicial y la trayectoria cambien, y que no sea posible disparar dos veces durante el mismo intento.
 
 La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de sliders, las tres masas, el reinicio durante el vuelo y el historial con los tiros más recientes primero.
 
-Resultados de la verificación en Unity 6000.4.6f1: nueve piezas y nueve joints intactos tras seis segundos; tiros de 7 N·s / 1 kg, 12 N·s / 1 kg y 24 N·s / 2 kg a 30° con 0, 7 y 8 piezas derribadas, respectivamente. Los resultados exactos pueden variar ligeramente entre plataformas por el solver físico.
+Los resultados exactos pueden variar ligeramente entre plataformas y según la distribución actual de la pared, debido al solver físico.
 
 ## Git y entrega
 

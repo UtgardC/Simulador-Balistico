@@ -49,7 +49,7 @@ namespace Ballistics
             float time = session.IsRunning ? session.Elapsed :
                 !session.IsRangeReady && session.LastShot != null ? session.LastShot.duration : 0;
             int pieces = session.IsRunning || session.IsRangeReady ? session.PiecesDown : session.LastShot.piecesDown;
-            liveTelemetry.text = $"Tiempo  {time:F1} s     Piezas  {pieces}/9";
+            liveTelemetry.text = $"Tiempo  {time:F1} s     Piezas  {pieces}/{session.TotalPieces}";
         }
 
         private void Refresh()
@@ -63,7 +63,7 @@ namespace Ballistics
                 var item = new Foldout { text = $"Tiro {shot.attempt}", value = false };
                 item.AddToClassList("shot-item");
                 item.Add(new Label($"Duración: {shot.duration:F2} s") { name = "shot-time" });
-                item.Add(new Label($"Piezas derribadas: {shot.piecesDown}/9") { name = "shot-pieces" });
+                item.Add(new Label($"Piezas derribadas: {shot.piecesDown}/{shot.totalPieces}") { name = "shot-pieces" });
                 item.Add(new Label($"Impactos registrados: {shot.impacts.Count}") { name = "impact-count" });
                 for (int i = 0; i < shot.impacts.Count; i++)
                 {

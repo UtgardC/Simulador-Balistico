@@ -23,6 +23,16 @@ namespace Ballistics
         public ShotRecord LastShot { get; private set; }
         public IReadOnlyList<ShotRecord> ShotHistory => shotHistory;
         public float Elapsed => IsRunning ? Time.fixedTime - startedAt : 0;
+        public int TotalPieces
+        {
+            get
+            {
+                if (pieces != null) return pieces.Length;
+                return structureTemplate != null
+                    ? structureTemplate.GetComponentsInChildren<TargetPiece>(true).Length
+                    : 0;
+            }
+        }
         public int PiecesDown
         {
             get
@@ -90,7 +100,7 @@ namespace Ballistics
             quietTime = 0;
             current = new ShotRecord { attempt = ++attempt, timestampUtc = DateTime.UtcNow.ToString("O"),
                 angleDegrees = angle, horizontalAngleDegrees = horizontalAngle,
-                launchImpulseNs = impulse, massKg = mass };
+                launchImpulseNs = impulse, massKg = mass, totalPieces = TotalPieces };
             preview.enabled = false;
             Changed?.Invoke();
         }

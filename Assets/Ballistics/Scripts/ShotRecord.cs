@@ -22,7 +22,7 @@ namespace Ballistics
         public string timestampUtc;
         public float angleDegrees, horizontalAngleDegrees, launchImpulseNs, massKg, duration;
         public string endReason;
-        public int piecesDown;
+        public int piecesDown, totalPieces;
         public bool hitTarget;
         public List<ImpactRecord> impacts = new List<ImpactRecord>();
     }
