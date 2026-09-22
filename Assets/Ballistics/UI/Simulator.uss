@@ -7,10 +7,11 @@
 .field-label { margin-top: 7px; margin-bottom: 3px; font-size: 12px; }
 Slider { height: 24px; }
 Slider .unity-base-slider__input { width: 45px; }
-#controls .unity-base-text-field__input { background-color: rgb(30, 47, 63); color: rgb(235, 242, 248); border-color: rgb(63, 90, 109); }
+#camera-angle .unity-base-slider__input { width: 56px; }
+#controls .unity-base-text-field__input, .camera-panel .unity-base-text-field__input { background-color: rgb(30, 47, 63); color: rgb(235, 242, 248); border-color: rgb(63, 90, 109); }
 #controls .unity-base-popup-field__input { background-color: rgb(30, 47, 63); color: rgb(235, 242, 248); border-color: rgb(63, 90, 109); }
 #controls .unity-base-popup-field__text { color: rgb(235, 242, 248); }
-#controls .unity-base-text-field__input, #controls .unity-base-popup-field__input { padding-top: 3px; padding-bottom: 3px; padding-left: 8px; padding-right: 8px; }
+#controls .unity-base-text-field__input, .camera-panel .unity-base-text-field__input, #controls .unity-base-popup-field__input { padding-top: 3px; padding-bottom: 3px; padding-left: 8px; padding-right: 8px; }
 DropdownField { height: 27px; margin-left: 0; margin-right: 0; }
 .mass-row { flex-direction: row; align-items: center; height: 28px; }
 .mass-slider { flex-grow: 1; margin-left: 0; margin-right: 5px; }
