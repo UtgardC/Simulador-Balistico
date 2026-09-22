@@ -32,6 +32,7 @@ namespace Ballistics
         private ScrollView history;
         private VisualElement controls;
         private bool updatingLinkedControls;
+        private float linkedVelocity;
         private readonly List<MarkerButtonBinding> markerButtons = new List<MarkerButtonBinding>();
 
         private void OnEnable()
@@ -99,14 +100,16 @@ namespace Ballistics
         private void OnImpulseChanged(ChangeEvent<float> evt)
         {
             if (updatingLinkedControls) return;
-            session.impulse = Mathf.Max(0.01f, evt.newValue);
+            session.impulse = Mathf.Max(0f, evt.newValue);
+            linkedVelocity = session.impulse / Mathf.Max(0.1f, session.mass);
             SyncImpulseAndVelocity();
         }
 
         private void OnVelocityChanged(ChangeEvent<float> evt)
         {
             if (updatingLinkedControls) return;
-            session.impulse = Mathf.Max(0.01f, evt.newValue) * Mathf.Max(0.1f, session.mass);
+            linkedVelocity = Mathf.Max(0f, evt.newValue);
+            session.impulse = linkedVelocity * Mathf.Max(0.1f, session.mass);
             SyncImpulseAndVelocity();
         }
 
@@ -127,16 +130,17 @@ namespace Ballistics
         {
             if (updatingLinkedControls) return;
             session.preserveVelocityOnMassChange = evt.newValue;
+            linkedVelocity = session.impulse / Mathf.Max(0.1f, session.mass);
             UpdatePreserveVelocityText();
         }
 
         private void ApplyMass(float newMass)
         {
-            float oldMass = Mathf.Max(0.1f, session.mass);
-            float oldVelocity = session.impulse / oldMass;
             session.mass = Mathf.Clamp(newMass, 0.1f, 50f);
             if (session.preserveVelocityOnMassChange)
-                session.impulse = oldVelocity * session.mass;
+                session.impulse = linkedVelocity * session.mass;
+            else
+                linkedVelocity = session.impulse / session.mass;
 
             SyncMassControls();
             SyncImpulseAndVelocity();
@@ -144,6 +148,7 @@ namespace Ballistics
 
         private void SyncControlsFromSession()
         {
+            linkedVelocity = session.impulse / Mathf.Max(0.1f, session.mass);
             updatingLinkedControls = true;
             angle.SetValueWithoutNotify(session.angle);
             horizontalAngle.SetValueWithoutNotify(session.horizontalAngle);
@@ -164,12 +169,11 @@ namespace Ballistics
 
         private void SyncImpulseAndVelocity()
         {
-            float initialVelocity = session.impulse / Mathf.Max(0.1f, session.mass);
             updatingLinkedControls = true;
             ExpandSliderToFit(impulse, session.impulse, 60f);
-            ExpandSliderToFit(velocity, initialVelocity, 100f);
+            ExpandSliderToFit(velocity, linkedVelocity, 100f);
             impulse.SetValueWithoutNotify(session.impulse);
-            velocity.SetValueWithoutNotify(initialVelocity);
+            velocity.SetValueWithoutNotify(linkedVelocity);
             updatingLinkedControls = false;
         }
 

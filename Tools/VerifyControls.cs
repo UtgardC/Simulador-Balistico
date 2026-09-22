@@ -26,6 +26,8 @@ public static class VerifyControls
         velocity.value = 10; Check(Approximately(session.impulse, 20), "Enlace entre velocidad e impulso incorrecto.");
         preserveVelocity.value = true; massInput.value = 4;
         Check(Approximately(session.mass, 4) && Approximately(session.impulse, 40) && Approximately(velocity.value, 10), "Conservación de velocidad incorrecta.");
+        massInput.value = 0.1f;
+        Check(Approximately(session.mass, 0.1f) && Approximately(session.impulse, 1) && Approximately(velocity.value, 10), "La velocidad cambió al reducir la masa.");
         angle.value = 30; horizontalAngle.value = 0; velocity.value = 12; massInput.value = 1;
         Submit(root.Q<Button>("fire"));
         Check(session.IsRunning && !root.Q<Button>("fire").enabledInHierarchy && !angle.enabledInHierarchy, "Disparo o bloqueo de controles incorrecto.");

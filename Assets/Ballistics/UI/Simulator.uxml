@@ -8,9 +8,9 @@
                 <ui:Label text="Ángulo horizontal (°)" class="field-label" />
                 <ui:Slider name="horizontal-angle" low-value="-45" high-value="45" show-input-field="true" />
                 <ui:Label text="Fuerza de disparo / impulso (N·s)" class="field-label" />
-                <ui:Slider name="impulse" low-value="0.1" high-value="60" show-input-field="true" />
+                <ui:Slider name="impulse" low-value="0" high-value="60" show-input-field="true" />
                 <ui:Label text="Velocidad inicial (m/s)" class="field-label" />
-                <ui:Slider name="velocity" low-value="0.1" high-value="100" show-input-field="true" />
+                <ui:Slider name="velocity" low-value="0" high-value="100" show-input-field="true" />
                 <ui:Label text="Masa del proyectil" class="field-label" />
                 <ui:VisualElement class="mass-row">
                     <ui:Slider name="mass-slider" low-value="0" high-value="28" class="mass-slider" />

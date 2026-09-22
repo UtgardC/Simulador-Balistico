@@ -15,7 +15,7 @@ namespace Ballistics
         public LineRenderer preview;
         [Range(5, 75)] public float angle = 30;
         [Range(-45, 45)] public float horizontalAngle;
-        [Min(0.1f)] public float impulse = 12;
+        [Min(0f)] public float impulse = 12;
         [Range(0.1f, 50f)] public float mass = 1;
         public bool preserveVelocityOnMassChange;
 
