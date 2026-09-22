@@ -1,89 +1,39 @@
-# Simulador balístico · Unity
+# Simulador balístico
 
-Proyecto educativo 3D con Rigidbody, FixedJoint y una interfaz hecha con UI Toolkit (UXML + USS). **Unity 6000.4.6f1**, Universal Render Pipeline 17.4.0.
+Simulador 3D hecho en **Unity 6000.4.6f1**. El objetivo es ajustar el disparo para derribar una estructura de bloques.
 
 ![Escena e interfaz del simulador](Docs/ballistic-lab.png)
 
 ## Cómo jugar
 
-1. Abrir esta carpeta desde Unity Hub con la versión indicada.
-2. Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` y presionar **Play**.
-3. Usar Game View en **16:9**, preferentemente 1280 × 720 o mayor.
-4. Ajustar elevación (5–75°), ángulo horizontal (−45–45°), impulso, velocidad inicial y masa (0,1–50 kg). La masa tiene un slider progresivo y un campo numérico para introducir cualquier valor exacto del rango.
-5. Pulsar **Disparar**. La simulación observa las colisiones y espera a que los cuerpos se detengan, con un máximo de 12 segundos.
-6. Consultar el historial plegable y pulsar **Nuevo intento** para reconstruir los objetivos. El botón también puede interrumpir un proyectil en vuelo.
+Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` en Unity y presionar **Play**.
 
-El slider de la esquina inferior izquierda gira la cámara entre 0° y 180° alrededor del eje Y de `CameraRotatingPivot`. Comienza en 67° y puede usarse incluso durante un tiro. Si el pivote aún no está guardado en la escena, se crea automáticamente al entrar en Play y se conserva la vista inicial de la cámara.
-
-Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botón de disparo, pero **Nuevo intento** permanece habilitado. Al concluir, los cuerpos se congelan hasta reconstruir el campo.
-
-Impulso y velocidad inicial permanecen vinculados mediante `velocidad = impulso / masa`. El selector inferior permite decidir qué conservar cuando cambia la masa: con **conservar impulso**, la velocidad se recalcula; con **conservar velocidad**, se recalcula el impulso necesario.
-
-## Física y evaluación
-
-- El lanzamiento aplica `Rigidbody.AddForce(dirección * impulso, ForceMode.Impulse)` una sola vez en FixedUpdate. La velocidad inicial es impulso / masa; la gravedad es la del proyecto (−9,81 m/s²). No se mueve el proyectil mediante Transform.
-- La "fuerza" de la interfaz es un **impulso en N·s**, no una fuerza continua en N. Es la magnitud correspondiente a ese modo de AddForce: [documentación de Unity](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Rigidbody.AddForce.html).
-- Proyectil esférico con Rigidbody, SphereCollider, detección continua e interpolación. La línea previa es orientativa: una parábola ideal sin colisiones; el disparo real lo resuelve PhysX.
-- La plantilla actual contiene cinco columnas de cuatro bloques de 0,8 kg, con Rigidbody y BoxCollider. Cada columna usa FixedJoints entre bloques y un anclaje cinemático en la base. Resistencia de rotura: 65 N y 45 N·m. La cantidad puede modificarse y se detecta automáticamente.
-- Una pieza cuenta como derribada si, al cerrar el intento, su centro está a más de **0,65 m** de la posición inicial o su rotación difiere más de **35°**. Romper un joint por sí solo no suma puntos.
-- También se registran impactos después de que el proyectil ruede o rebote.
-- Se esperan al menos tres segundos desde el primer impacto y 0,8 segundos de reposo de todos los cuerpos. Hay límites de tiempo y de salida del campo para que un tiro no bloquee el juego.
-
-## Telemetría e historial
-
-La telemetría principal se limita al tiempo transcurrido y las piezas derribadas. La cantidad total se obtiene automáticamente de los componentes `TargetPiece`, por lo que admite paredes más grandes sin tocar el código. Debajo se muestran los tiros de la sesión, con el más reciente arriba. Cada fila se abre o cierra al hacer clic y contiene la duración, las piezas derribadas y todos los impactos registrados: objeto y punto de contacto, tiempo de vuelo, velocidad relativa e impulso. La rueda del mouse desplaza la lista. La puntuación no se muestra.
-
-Al golpear un bloque aparece una esfera amarilla pequeña en el punto global de contacto. Los botones **Mostrar/Ocultar** permiten recuperar un impacto particular o todos los impactos de un tiro desde el historial. Solo se visualizan marcadores de un tiro a la vez: al elegir otro, los anteriores se ocultan automáticamente.
-
-El historial vive en memoria y se reinicia al salir de Play Mode. No se crean archivos JSON. Si se pulsa **Nuevo intento** durante un disparo, se registra el resultado parcial como tiro interrumpido y el campo se reconstruye inmediatamente.
-
-El código conserva internamente los eventos `OnCollisionEnter` del proyectil, incluidos el punto, la velocidad relativa y el impulso. Esos datos quedan disponibles para evaluación o ampliaciones, aunque la interfaz simplificada no los presenta.
-
-## Organización
-
-| Carpeta | Contenido |
+| Control | Función |
 | --- | --- |
-| `Assets/Ballistics/Scenes` | Escena lista para jugar, incluida en Build Settings |
-| `Assets/Ballistics/Scripts` | Sesión, proyectil, piezas, datos y enlace de interfaz |
-| `Assets/Ballistics/Prefabs` | Proyectil y estructura completa con joints conectados |
-| `Assets/Ballistics/UI` | UXML, USS y PanelSettings editables |
-| `Assets/Ballistics/Materials` | Materiales visuales y de contacto |
-| `Assets/Ballistics/Editor` | Generador de escena y prefabs |
-| `Tools` | Generación y verificación automatizada mediante Unity Pipeline |
+| Ángulo de elevación | Inclina el disparo hacia arriba o abajo. |
+| Ángulo horizontal | Apunta hacia los lados. |
+| Fuerza de disparo / impulso | Cambia el impulso aplicado al proyectil, medido en N·s. |
+| Velocidad inicial | Ajusta la velocidad de salida en m/s; el impulso se recalcula automáticamente. |
+| Masa del proyectil | Permite elegir entre 0,1 y 50 kg con el slider o escribir un valor exacto. |
+| Conservar impulso / velocidad | Al cambiar la masa, decide cuál de los dos valores permanece fijo. El otro se ajusta según `velocidad = impulso / masa`. |
+| **Disparar** | Lanza el proyectil. |
+| **Nuevo intento** | Reconstruye los objetivos; también interrumpe un tiro en curso. |
 
-La escena anterior permanece en `Assets/Scenes`. Si había cambios sin guardar, se preservaron en `BeforeBallisticSetup.unity`.
+El slider **Ángulo de cámara**, en la esquina inferior izquierda, gira la cámara entre 0° y 180°. Comienza en 67° y se puede mover durante el disparo.
 
-### Acomodar los objetivos
+## Registro de tiros
 
-En la jerarquía de `BallisticLab`, mover o rotar **Objetivos - plantilla editable**. Esa transformación —incluido el giro sobre Y— se conserva al entrar en Play y se usa para reconstruir cada intento. También se pueden ajustar sus bloques hijos, siempre que se mantengan coherentes las conexiones de sus FixedJoint. El ángulo horizontal del disparo permite apuntar a objetivos desplazados en profundidad.
+El panel de la esquina superior derecha muestra los tiros de la sesión, con el más reciente arriba. Cada tiro se puede desplegar para ver su duración, las piezas derribadas y los impactos registrados. De cada impacto se muestra el objeto, tiempo de vuelo, punto de contacto, velocidad relativa e impulso de colisión.
 
-Para regenerar los assets iniciales: menú **Ballistics → Crear o reconstruir escena**. Esto restablece la escena, materiales y prefabs del simulador; guardar antes cualquier personalización. No es necesario ejecutar el generador para jugar un clon del repositorio.
+Una esfera amarilla marca los impactos contra los bloques. En el registro, **Mostrar/Ocultar** permite ver un punto específico o todos los puntos de un tiro. Al seleccionar otro tiro, se ocultan los marcadores del anterior. El registro se reinicia al salir de Play.
 
-## Verificación
+## Criterios de evaluación
 
-Con el paquete Unity Pipeline del proyecto y su CLI disponibles:
+- **Controles:** ángulo, impulso, velocidad y masa ajustables desde la interfaz.
+- **Disparo físico:** proyectil con Rigidbody y Collider, lanzado mediante `AddForce` según los ángulos elegidos.
+- **Objetivos:** bloques con Rigidbody conectados por FixedJoint, estables antes del disparo.
+- **Resultados:** registro por tiro del tiempo de vuelo, punto de impacto, velocidad relativa, impulso de colisión y piezas derribadas.
 
-```powershell
-unity command --project-path . editor_play
-unity command --project-path . --timeout 58 run_script --file Tools/VerifyLab.cs --timeout_ms 55000
-unity command --project-path . editor_stop
-```
+## Video
 
-Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificación espera seis segundos sin disparar, comprueba la cantidad configurada de piezas y sus joints, ejecuta tres tiros y verifica la física, la telemetría y el orden del historial. No ejecutar dos verificaciones simultáneas.
-
-Los controles se pueden verificar manualmente variando cada slider y la masa, comprobando que la velocidad inicial y la trayectoria cambien, y que no sea posible disparar dos veces durante el mismo intento.
-
-La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de ángulos, masa, impulso y velocidad, los dos modos de conservación, el reinicio durante el vuelo y el historial con los tiros más recientes primero.
-
-Los resultados exactos pueden variar ligeramente entre plataformas y según la distribución actual de la pared, debido al solver físico.
-
-## Git y entrega
-
-Versionar `Assets/` (incluidos los `.meta`), `Packages/`, `ProjectSettings/`, `Tools/`, README y `.gitignore`. Se excluyen Library, Temp, Logs, UserSettings, builds y archivos de IDE. El repositorio remoto y la publicación se configuran con la cuenta del autor.
-
-## Video de YouTube
-
-**Enlace: pendiente de grabar y publicar.**
-
-Guion sugerido, 1–3 minutos: mostrar la interfaz y la estabilidad inicial; hacer un tiro a 30° / 7 N·s / 1 kg, otro a 30° / 12 N·s / 1 kg y otro a 30° / 24 N·s / 2 kg; desplegar algunas filas del historial y mostrar un reinicio durante el vuelo. Explicar que duplicar impulso y masa conserva la velocidad inicial pero aumenta el momento del proyectil. Sustituir este texto por el enlace real antes de entregar.
-
+Enlace de YouTube pendiente de agregar.
