@@ -15,11 +15,18 @@ public static class VerifyControls
         var angle = root.Q<Slider>("angle");
         var horizontalAngle = root.Q<Slider>("horizontal-angle");
         var impulse = root.Q<Slider>("impulse");
-        var mass = root.Q<DropdownField>("mass");
-        angle.value = 45; horizontalAngle.value = 20; impulse.value = 15; mass.index = 0;
-        Check(session.angle == 45 && session.horizontalAngle == 20 && session.impulse == 15 && session.mass == 0.5f, "Enlace de controles incorrecto.");
-        mass.index = 2; Check(session.mass == 2, "Masa pesada incorrecta.");
-        angle.value = 30; horizontalAngle.value = 0; impulse.value = 12; mass.index = 1;
+        var velocity = root.Q<Slider>("velocity");
+        var massSlider = root.Q<Slider>("mass-slider");
+        var massInput = root.Q<FloatField>("mass-input");
+        var preserveVelocity = root.Q<Toggle>("preserve-velocity");
+        preserveVelocity.value = false;
+        angle.value = 45; horizontalAngle.value = 20; impulse.value = 15; massInput.value = 0.5f;
+        Check(Approximately(session.angle, 45) && Approximately(session.horizontalAngle, 20) && Approximately(session.impulse, 15) && Approximately(session.mass, 0.5f) && Approximately(velocity.value, 30), "Enlace de controles incorrecto.");
+        massSlider.value = 10; Check(Approximately(session.mass, 2) && Approximately(session.impulse, 15) && Approximately(velocity.value, 7.5f), "Conservación de impulso incorrecta.");
+        velocity.value = 10; Check(Approximately(session.impulse, 20), "Enlace entre velocidad e impulso incorrecto.");
+        preserveVelocity.value = true; massInput.value = 4;
+        Check(Approximately(session.mass, 4) && Approximately(session.impulse, 40) && Approximately(velocity.value, 10), "Conservación de velocidad incorrecta.");
+        angle.value = 30; horizontalAngle.value = 0; velocity.value = 12; massInput.value = 1;
         Submit(root.Q<Button>("fire"));
         Check(session.IsRunning && !root.Q<Button>("fire").enabledInHierarchy && !angle.enabledInHierarchy, "Disparo o bloqueo de controles incorrecto.");
         Check(root.Q<Button>("reset").enabledInHierarchy, "Nuevo intento debe estar habilitado durante el vuelo.");
@@ -49,5 +56,6 @@ public static class VerifyControls
     {
         using (var evt = NavigationSubmitEvent.GetPooled()) { evt.target = button; button.SendEvent(evt); }
     }
+    private static bool Approximately(float left, float right) { return Mathf.Abs(left - right) < 0.001f; }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
 }

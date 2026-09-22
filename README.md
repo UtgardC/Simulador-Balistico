@@ -9,11 +9,13 @@ Proyecto educativo 3D con Rigidbody, FixedJoint y una interfaz hecha con UI Tool
 1. Abrir esta carpeta desde Unity Hub con la versión indicada.
 2. Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` y presionar **Play**.
 3. Usar Game View en **16:9**, preferentemente 1280 × 720 o mayor.
-4. Ajustar elevación (5–75°), ángulo horizontal (−45–45°), fuerza de disparo expresada como impulso (5–60 N·s) y masa (0,5 / 1 / 2 kg). Los sliders también tienen entrada numérica.
+4. Ajustar elevación (5–75°), ángulo horizontal (−45–45°), impulso, velocidad inicial y masa (0,1–50 kg). La masa tiene un slider progresivo y un campo numérico para introducir cualquier valor exacto del rango.
 5. Pulsar **Disparar**. La simulación observa las colisiones y espera a que los cuerpos se detengan, con un máximo de 12 segundos.
 6. Consultar el historial plegable y pulsar **Nuevo intento** para reconstruir los objetivos. El botón también puede interrumpir un proyectil en vuelo.
 
 Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botón de disparo, pero **Nuevo intento** permanece habilitado. Al concluir, los cuerpos se congelan hasta reconstruir el campo.
+
+Impulso y velocidad inicial permanecen vinculados mediante `velocidad = impulso / masa`. El selector inferior permite decidir qué conservar cuando cambia la masa: con **conservar impulso**, la velocidad se recalcula; con **conservar velocidad**, se recalcula el impulso necesario.
 
 ## Física y evaluación
 
@@ -28,6 +30,8 @@ Solo hace falta el mouse. Durante el tiro se bloquean los parámetros y el botó
 ## Telemetría e historial
 
 La telemetría principal se limita al tiempo transcurrido y las piezas derribadas. La cantidad total se obtiene automáticamente de los componentes `TargetPiece`, por lo que admite paredes más grandes sin tocar el código. Debajo se muestran los tiros de la sesión, con el más reciente arriba. Cada fila se abre o cierra al hacer clic y contiene la duración, las piezas derribadas y todos los impactos registrados: objeto y punto de contacto, tiempo de vuelo, velocidad relativa e impulso. La rueda del mouse desplaza la lista. La puntuación no se muestra.
+
+Al golpear un bloque aparece una esfera amarilla pequeña en el punto global de contacto. Los botones **Mostrar/Ocultar** permiten recuperar un impacto particular o todos los impactos de un tiro desde el historial. Solo se visualizan marcadores de un tiro a la vez: al elegir otro, los anteriores se ocultan automáticamente.
 
 El historial vive en memoria y se reinicia al salir de Play Mode. No se crean archivos JSON. Si se pulsa **Nuevo intento** durante un disparo, se registra el resultado parcial como tiro interrumpido y el campo se reconstruye inmediatamente.
 
@@ -67,7 +71,7 @@ Abrir primero BallisticLab y esperar a que Play termine de cargar. La verificaci
 
 Los controles se pueden verificar manualmente variando cada slider y la masa, comprobando que la velocidad inicial y la trayectoria cambien, y que no sea posible disparar dos veces durante el mismo intento.
 
-La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de sliders, las tres masas, el reinicio durante el vuelo y el historial con los tiros más recientes primero.
+La prueba `Tools/VerifyControls.cs`, ejecutada con `run_script` en Play, también comprueba el enlace de ángulos, masa, impulso y velocidad, los dos modos de conservación, el reinicio durante el vuelo y el historial con los tiros más recientes primero.
 
 Los resultados exactos pueden variar ligeramente entre plataformas y según la distribución actual de la pared, debido al solver físico.
 

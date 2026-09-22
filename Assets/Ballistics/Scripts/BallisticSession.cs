@@ -15,8 +15,9 @@ namespace Ballistics
         public LineRenderer preview;
         [Range(5, 75)] public float angle = 30;
         [Range(-45, 45)] public float horizontalAngle;
-        [Range(5, 60)] public float impulse = 12;
-        public float mass = 1;
+        [Min(0.1f)] public float impulse = 12;
+        [Range(0.1f, 50f)] public float mass = 1;
+        public bool preserveVelocityOnMassChange;
 
         public bool IsRunning { get; private set; }
         public bool IsRangeReady { get; private set; }
@@ -43,6 +44,7 @@ namespace Ballistics
             }
         }
         public event Action Changed;
+        public event Action ImpactMarkersChanged;
         private GameObject structure;
         private TargetPiece[] pieces;
         private Projectile projectile;
@@ -55,6 +57,10 @@ namespace Ballistics
         private readonly Vector3[] previewPoints = new Vector3[70];
         private Vector3 fallbackTemplatePosition = new Vector3(12, 0, 0);
         private Quaternion fallbackTemplateRotation = Quaternion.identity;
+        private Transform impactMarkerRoot;
+        private Material impactMarkerMaterial;
+        private ShotRecord displayedMarkerShot;
+        private readonly Dictionary<int, GameObject> impactMarkers = new Dictionary<int, GameObject>();
 
         private Quaternion LaunchRotation => Quaternion.Euler(0, -horizontalAngle, angle);
 
@@ -92,6 +98,7 @@ namespace Ballistics
         public void Fire()
         {
             if (IsRunning || !IsRangeReady) return;
+            ClearImpactMarkers();
             IsRunning = true;
             IsRangeReady = false;
             pendingLaunch = true;
@@ -141,6 +148,113 @@ namespace Ballistics
             if (firstImpactAt < 0) firstImpactAt = Time.fixedTime;
             current.impacts.Add(impact);
             current.hitTarget |= impact.target;
+            if (impact.target)
+                ShowImpactMarker(current, current.impacts.Count - 1);
+        }
+
+        public bool IsImpactMarkerVisible(ShotRecord shot, int impactIndex)
+        {
+            return displayedMarkerShot == shot && impactMarkers.ContainsKey(impactIndex);
+        }
+
+        public bool AreAllImpactMarkersVisible(ShotRecord shot)
+        {
+            return shot != null && shot.impacts.Count > 0 && displayedMarkerShot == shot &&
+                   impactMarkers.Count == shot.impacts.Count;
+        }
+
+        public void ToggleImpactMarker(ShotRecord shot, int impactIndex)
+        {
+            if (shot == null || impactIndex < 0 || impactIndex >= shot.impacts.Count) return;
+            if (displayedMarkerShot != shot)
+            {
+                ClearImpactMarkersInternal(false);
+                displayedMarkerShot = shot;
+            }
+
+            if (impactMarkers.TryGetValue(impactIndex, out var marker))
+            {
+                if (marker != null) Destroy(marker);
+                impactMarkers.Remove(impactIndex);
+                if (impactMarkers.Count == 0) displayedMarkerShot = null;
+            }
+            else ShowImpactMarkerInternal(shot, impactIndex);
+
+            ImpactMarkersChanged?.Invoke();
+        }
+
+        public void ToggleAllImpactMarkers(ShotRecord shot)
+        {
+            if (shot == null || shot.impacts.Count == 0) return;
+            if (AreAllImpactMarkersVisible(shot))
+            {
+                ClearImpactMarkers();
+                return;
+            }
+
+            ClearImpactMarkersInternal(false);
+            displayedMarkerShot = shot;
+            for (int i = 0; i < shot.impacts.Count; i++)
+                ShowImpactMarkerInternal(shot, i);
+            ImpactMarkersChanged?.Invoke();
+        }
+
+        public void ClearImpactMarkers()
+        {
+            ClearImpactMarkersInternal(false);
+            ImpactMarkersChanged?.Invoke();
+        }
+
+        private void ShowImpactMarker(ShotRecord shot, int impactIndex)
+        {
+            if (displayedMarkerShot != shot)
+            {
+                ClearImpactMarkersInternal(false);
+                displayedMarkerShot = shot;
+            }
+            ShowImpactMarkerInternal(shot, impactIndex);
+            ImpactMarkersChanged?.Invoke();
+        }
+
+        private void ShowImpactMarkerInternal(ShotRecord shot, int impactIndex)
+        {
+            if (impactMarkers.ContainsKey(impactIndex)) return;
+            if (impactMarkerRoot == null)
+            {
+                var root = new GameObject("Marcadores de impacto");
+                impactMarkerRoot = root.transform;
+            }
+            if (impactMarkerMaterial == null)
+            {
+                var shader = Shader.Find("Universal Render Pipeline/Unlit");
+                if (shader == null) shader = Shader.Find("Unlit/Color");
+                impactMarkerMaterial = new Material(shader) { color = new Color(1f, 0.82f, 0.05f) };
+                if (impactMarkerMaterial.HasProperty("_BaseColor"))
+                    impactMarkerMaterial.SetColor("_BaseColor", new Color(1f, 0.82f, 0.05f));
+            }
+
+            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            marker.name = $"Impacto {shot.attempt}.{impactIndex + 1}";
+            marker.transform.SetParent(impactMarkerRoot, false);
+            marker.transform.position = shot.impacts[impactIndex].point;
+            marker.transform.localScale = Vector3.one * 0.18f;
+            marker.layer = 2;
+            marker.GetComponent<Collider>().enabled = false;
+            marker.GetComponent<Renderer>().sharedMaterial = impactMarkerMaterial;
+            impactMarkers.Add(impactIndex, marker);
+        }
+
+        private void ClearImpactMarkersInternal(bool destroyRoot)
+        {
+            foreach (var marker in impactMarkers.Values)
+                if (marker != null) Destroy(marker);
+            impactMarkers.Clear();
+            displayedMarkerShot = null;
+            if (destroyRoot && impactMarkerRoot != null)
+            {
+                Destroy(impactMarkerRoot.gameObject);
+                impactMarkerRoot = null;
+            }
         }
 
         private void CompleteShot(string reason, bool freezeBodies)
@@ -166,6 +280,7 @@ namespace Ballistics
         public void ResetRange()
         {
             if (IsRunning) CompleteShot("Interrumpido", false);
+            ClearImpactMarkers();
             if (structure != null) { structure.SetActive(false); Destroy(structure); }
             if (projectile != null) { projectile.gameObject.SetActive(false); Destroy(projectile.gameObject); }
             if (structureTemplate == null)
@@ -186,6 +301,12 @@ namespace Ballistics
             IsRangeReady = true;
             preview.enabled = true;
             Changed?.Invoke();
+        }
+
+        private void OnDestroy()
+        {
+            ClearImpactMarkersInternal(true);
+            if (impactMarkerMaterial != null) Destroy(impactMarkerMaterial);
         }
     }
 }

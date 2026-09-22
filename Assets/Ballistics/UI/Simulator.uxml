@@ -8,9 +8,16 @@
                 <ui:Label text="Ángulo horizontal (°)" class="field-label" />
                 <ui:Slider name="horizontal-angle" low-value="-45" high-value="45" show-input-field="true" />
                 <ui:Label text="Fuerza de disparo / impulso (N·s)" class="field-label" />
-                <ui:Slider name="impulse" low-value="5" high-value="60" show-input-field="true" />
+                <ui:Slider name="impulse" low-value="0.1" high-value="60" show-input-field="true" />
+                <ui:Label text="Velocidad inicial (m/s)" class="field-label" />
+                <ui:Slider name="velocity" low-value="0.1" high-value="100" show-input-field="true" />
                 <ui:Label text="Masa del proyectil" class="field-label" />
-                <ui:DropdownField name="mass" />
+                <ui:VisualElement class="mass-row">
+                    <ui:Slider name="mass-slider" low-value="0" high-value="28" class="mass-slider" />
+                    <ui:FloatField name="mass-input" class="mass-input" />
+                    <ui:Label text="kg" class="mass-unit" />
+                </ui:VisualElement>
+                <ui:Toggle name="preserve-velocity" text="Al cambiar masa: conservar impulso" class="preserve-switch" />
             </ui:VisualElement>
             <ui:Button name="fire" text="DISPARAR  →" class="primary" />
             <ui:Button name="reset" text="NUEVO INTENTO" />
