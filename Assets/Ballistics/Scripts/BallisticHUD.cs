@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -30,9 +31,15 @@ namespace Ballistics
         private FloatField massInput;
         private Toggle preserveVelocity;
         private Button fire, reset;
+        private Button savedShotsButton;
         private Label liveTelemetry;
+        private Label cloudStatus;
         private ScrollView history;
+        private ScrollView savedHistory;
         private VisualElement controls;
+        private ShotPersistence persistence;
+        private bool viewingSavedShots;
+        private bool loadingSavedShots;
         private bool updatingLinkedControls;
         private bool cameraAngleInitialized;
         private float linkedVelocity;
@@ -51,9 +58,17 @@ namespace Ballistics
             preserveVelocity = root.Q<Toggle>("preserve-velocity");
             fire = root.Q<Button>("fire");
             reset = root.Q<Button>("reset");
+            savedShotsButton = root.Q<Button>("saved-shots");
             liveTelemetry = root.Q<Label>("live-telemetry");
+            cloudStatus = root.Q<Label>("cloud-status");
             history = root.Q<ScrollView>("history");
+            savedHistory = root.Q<ScrollView>("saved-history");
             controls = root.Q("controls");
+            persistence = session.GetComponent<ShotPersistence>();
+            if (persistence == null)
+                persistence = session.gameObject.AddComponent<ShotPersistence>();
+            savedHistory.style.display = DisplayStyle.None;
+            SetCloudStatus(persistence.Status);
 
             EnsureCameraPivot();
             if (cameraRotatingPivot != null)
@@ -82,8 +97,10 @@ namespace Ballistics
             cameraAngle.RegisterValueChangedCallback(OnCameraAngleChanged);
             fire.clicked += session.Fire;
             reset.clicked += session.ResetRange;
+            savedShotsButton.clicked += ToggleSavedShots;
             session.Changed += Refresh;
             session.ImpactMarkersChanged += RefreshMarkerButtons;
+            persistence.StatusChanged += SetCloudStatus;
             Refresh();
         }
 
@@ -99,8 +116,10 @@ namespace Ballistics
             cameraAngle.UnregisterValueChangedCallback(OnCameraAngleChanged);
             session.Changed -= Refresh;
             session.ImpactMarkersChanged -= RefreshMarkerButtons;
+            persistence.StatusChanged -= SetCloudStatus;
             fire.clicked -= session.Fire;
             reset.clicked -= session.ResetRange;
+            savedShotsButton.clicked -= ToggleSavedShots;
         }
 
         private void Update()
@@ -328,6 +347,60 @@ namespace Ballistics
                 binding.button.text = visible ? "Ocultar" : "Mostrar";
                 binding.button.SetEnabled(!binding.allImpacts || binding.shot.impacts.Count > 0);
             }
+        }
+
+        private async void ToggleSavedShots()
+        {
+            viewingSavedShots = !viewingSavedShots;
+            history.style.display = viewingSavedShots ? DisplayStyle.None : DisplayStyle.Flex;
+            savedHistory.style.display = viewingSavedShots ? DisplayStyle.Flex : DisplayStyle.None;
+            savedShotsButton.text = viewingSavedShots ? "VOLVER A TIROS" : "RESULTADOS GUARDADOS";
+            if (!viewingSavedShots || loadingSavedShots) return;
+
+            loadingSavedShots = true;
+            savedHistory.Clear();
+            SetCloudStatus("Cargando resultados de UGS...");
+            try
+            {
+                var shots = await persistence.LoadSavedShotsAsync();
+                foreach (var shot in shots)
+                {
+                    var item = new Foldout { text = SavedShotTitle(shot), value = false };
+                    item.AddToClassList("shot-item");
+                    item.Add(new Label($"Acierto: {(shot.hitTarget ? "Sí" : "No")}"));
+                    item.Add(new Label($"Elevación: {shot.angleDegrees:F1}° · Horizontal: {shot.horizontalAngleDegrees:F1}°"));
+                    item.Add(new Label($"Impulso: {shot.impulseNs:F2} N·s · Masa: {shot.massKg:F2} kg"));
+                    item.Add(new Label($"Distancia horizontal: {shot.distanceMeters:F2} m"));
+                    item.Add(new Label($"Piezas derribadas: {shot.piecesDown}"));
+                    item.Add(new Label($"Cierre: {shot.endReason}"));
+                    savedHistory.Add(item);
+                }
+                SetCloudStatus(shots.Count == 0
+                    ? "Todavía no hay tiros guardados en UGS."
+                    : $"{shots.Count} tiro(s) recuperado(s) de UGS.");
+            }
+            catch (Exception exception)
+            {
+                SetCloudStatus("No se pudieron cargar los resultados. Revisá Services y la conexión.");
+                Debug.LogException(exception);
+            }
+            finally
+            {
+                loadingSavedShots = false;
+            }
+        }
+
+        private static string SavedShotTitle(SavedShot shot)
+        {
+            if (DateTime.TryParse(shot.timestampUtc, out var date))
+                return $"{date.ToLocalTime():dd/MM HH:mm} · {(shot.hitTarget ? "Acierto" : "Fallo")}";
+            return shot.hitTarget ? "Tiro guardado · Acierto" : "Tiro guardado · Fallo";
+        }
+
+        private void SetCloudStatus(string message)
+        {
+            cloudStatus.text = message;
+            cloudStatus.style.display = string.IsNullOrEmpty(message) ? DisplayStyle.None : DisplayStyle.Flex;
         }
     }
 }

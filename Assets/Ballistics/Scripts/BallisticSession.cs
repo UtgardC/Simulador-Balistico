@@ -45,6 +45,7 @@ namespace Ballistics
         }
         public event Action Changed;
         public event Action ImpactMarkersChanged;
+        public event Action<ShotRecord> ShotCompleted;
         private GameObject structure;
         private TargetPiece[] pieces;
         private Projectile projectile;
@@ -54,6 +55,7 @@ namespace Ballistics
         private int attempt;
         private float startedAt, firstImpactAt, quietTime;
         private bool pendingLaunch;
+        private Vector3 shotLaunchPosition;
         private readonly Vector3[] previewPoints = new Vector3[70];
         private Vector3 fallbackTemplatePosition = new Vector3(12, 0, 0);
         private Quaternion fallbackTemplateRotation = Quaternion.identity;
@@ -108,6 +110,7 @@ namespace Ballistics
             current = new ShotRecord { attempt = ++attempt, timestampUtc = DateTime.UtcNow.ToString("O"),
                 angleDegrees = angle, horizontalAngleDegrees = horizontalAngle,
                 launchImpulseNs = impulse, massKg = mass, totalPieces = TotalPieces };
+            shotLaunchPosition = muzzle.position;
             preview.enabled = false;
             Changed?.Invoke();
         }
@@ -119,6 +122,7 @@ namespace Ballistics
             {
                 pendingLaunch = false;
                 barrelPivot.rotation = LaunchRotation;
+                shotLaunchPosition = muzzle.position;
                 projectile = Instantiate(projectilePrefab, muzzle.position, Quaternion.identity);
                 projectileBody = projectile.GetComponent<Rigidbody>();
                 projectile.Launch(this, barrelPivot.right, impulse, mass);
@@ -263,6 +267,21 @@ namespace Ballistics
             current.duration = Elapsed;
             current.endReason = reason;
             current.piecesDown = PiecesDown;
+            Vector3 endpoint = projectile != null ? projectile.transform.position : shotLaunchPosition;
+            if (current.impacts.Count > 0)
+            {
+                var selectedImpact = current.impacts[0];
+                foreach (var impact in current.impacts)
+                {
+                    if (!impact.target) continue;
+                    selectedImpact = impact;
+                    break;
+                }
+                endpoint = selectedImpact.point;
+            }
+            current.distanceMeters = Vector2.Distance(
+                new Vector2(shotLaunchPosition.x, shotLaunchPosition.z),
+                new Vector2(endpoint.x, endpoint.z));
             LastShot = current;
             shotHistory.Insert(0, current);
             IsRunning = false;
@@ -275,6 +294,7 @@ namespace Ballistics
             }
             current = null;
             Changed?.Invoke();
+            ShotCompleted?.Invoke(LastShot);
         }
 
         public void ResetRange()

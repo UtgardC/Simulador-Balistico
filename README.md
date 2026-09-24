@@ -27,12 +27,18 @@ El panel de la esquina superior derecha muestra los tiros de la sesión, con el 
 
 Una esfera amarilla marca los impactos contra los bloques. En el registro, **Mostrar/Ocultar** permite ver un punto específico o todos los puntos de un tiro. Al seleccionar otro tiro, se ocultan los marcadores del anterior. El registro se reinicia al salir de Play.
 
+## Resultados guardados en UGS
+
+Al finalizar cada disparo, el juego guarda en Unity Cloud Save el ángulo, impulso, masa, acierto, distancia y piezas derribadas. **Resultados guardados** recupera los tiros de la nube; **Volver a tiros** muestra otra vez el historial de la sesión. La distancia es horizontal, desde la boca de disparo hasta el impacto contra un bloque; si no hubo acierto, se usa el primer contacto o la posición final del proyectil.
+
+Para activar Cloud Save, abrir **Edit → Project Settings → Services** y vincular este proyecto con un proyecto de Unity Gaming Services de tu cuenta. El juego inicia sesión anónimamente; los resultados se asocian a ese jugador. El estado del guardado o cualquier error de conexión aparece en el panel de resultados.
+
 ## Criterios de evaluación
 
 - **Controles:** ángulo, impulso, velocidad y masa ajustables desde la interfaz.
 - **Disparo físico:** proyectil con Rigidbody y Collider, lanzado mediante `AddForce` según los ángulos elegidos.
 - **Objetivos:** bloques con Rigidbody conectados por FixedJoint, estables antes del disparo.
-- **Resultados:** registro por tiro del tiempo de vuelo, punto de impacto, velocidad relativa, impulso de colisión y piezas derribadas.
+- **Resultados:** registro por tiro del tiempo de vuelo, punto de impacto, velocidad relativa, impulso de colisión y piezas derribadas; guardado y recuperación de los resultados mediante UGS.
 
 ## Video
 
