@@ -388,7 +388,9 @@ namespace Ballistics
                     item.Add(new Label($"Impulso: {shot.impulseNs:F2} N·s · Masa: {shot.massKg:F2} kg"));
                     item.Add(new Label($"Distancia horizontal: {shot.distanceMeters:F2} m"));
                     item.Add(new Label($"Piezas derribadas: {shot.piecesDown}"));
-                    item.Add(new Label($"Cierre: {shot.endReason}"));
+                    item.Add(new Label(shot.hasDuration
+                        ? $"Duración de tiro: {shot.durationSeconds:F2} s"
+                        : "Duración de tiro: sin dato"));
                     savedHistory.Add(item);
                 }
                 SetCloudStatus(shots.Count == 0

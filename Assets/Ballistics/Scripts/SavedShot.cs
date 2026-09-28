@@ -16,6 +16,8 @@ namespace Ballistics
         public bool hitTarget;
         public float distanceMeters;
         public int piecesDown;
+        public float durationSeconds;
+        public bool hasDuration;
         public string endReason;
 
         public static SavedShot FromShot(ShotRecord shot)
@@ -31,6 +33,8 @@ namespace Ballistics
                 hitTarget = shot.hitTarget,
                 distanceMeters = shot.distanceMeters,
                 piecesDown = shot.piecesDown,
+                durationSeconds = shot.duration,
+                hasDuration = true,
                 endReason = shot.endReason
             };
         }
