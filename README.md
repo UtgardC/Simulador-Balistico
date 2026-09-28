@@ -4,9 +4,7 @@ Simulador 3D hecho en **Unity 6000.4.6f1**. El objetivo es ajustar el disparo pa
 
 ![Escena e interfaz del simulador](Docs/ballistic-lab.png)
 
-## Cómo jugar
-
-Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` en Unity y presionar **Play**.
+## Controles
 
 | Control | Función |
 | --- | --- |
@@ -42,4 +40,4 @@ Para activar Cloud Save, abrir **Edit → Project Settings → Services** y vinc
 
 ## Video
 
-Enlace de YouTube pendiente de agregar.
+https://youtu.be/esqKGpsQuRk
