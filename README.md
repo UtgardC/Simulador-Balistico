@@ -1,4 +1,4 @@
-# Simulador balístico
+# Simulador balístico + UGS
 
 Simulador 3D hecho en **Unity 6000.4.6f1**. El objetivo es ajustar el disparo para derribar una estructura de bloques.
 
@@ -27,17 +27,20 @@ Una esfera amarilla marca los impactos contra los bloques. En el registro, **Mos
 
 ## Resultados guardados en UGS
 
-Al finalizar cada disparo, el juego guarda en Unity Cloud Save el ángulo, impulso, masa, acierto, distancia y piezas derribadas. **Resultados guardados** muestra los tiros recuperados de la nube; **Resultados locales** muestra los tiros de la sesión actual. La distancia es horizontal, desde la boca de disparo hasta el impacto contra un bloque; si no hubo acierto, se usa el primer contacto o la posición final del proyectil.
+Al finalizar cada tiro, sus resultados se guardan automáticamente en Unity Gaming Services mediante Cloud Save. El botón Guardar y reiniciar permite finalizar un tiro en curso, guardar sus resultados y preparar el siguiente intento.
+- **Resultados locales:** muestra los tiros de la sesión actual, con el detalle de los impactos y botones para visualizar sus posiciones.
+- **Resultados guardados:** recupera el historial desde UGS, ordenado del más reciente al más antiguo. Incluye ángulos, impulso, masa, acierto, distancia horizontal, piezas derribadas y duración del tiro.
 
-Para activar Cloud Save, abrir **Edit → Project Settings → Services** y vincular este proyecto con un proyecto de Unity Gaming Services de tu cuenta. El juego inicia sesión anónimamente; los resultados se asocian a ese jugador. El estado del guardado o cualquier error de conexión aparece en el panel de resultados.
+El guardado y la consulta requieren conexión a Internet. Se utiliza autenticación anónima: el historial corresponde al jugador identificado en ese dispositivo.
 
 ## Criterios de evaluación
 
 - **Controles:** ángulo, impulso, velocidad y masa ajustables desde la interfaz.
 - **Disparo físico:** proyectil con Rigidbody y Collider, lanzado mediante `AddForce` según los ángulos elegidos.
 - **Objetivos:** bloques con Rigidbody conectados por FixedJoint, estables antes del disparo.
-- **Resultados:** registro por tiro del tiempo de vuelo, punto de impacto, velocidad relativa, impulso de colisión y piezas derribadas; guardado y recuperación de los resultados mediante UGS.
+- **Resultados:** registro por tiro del tiempo de vuelo, punto de impacto, velocidad relativa, impulso de colisión y piezas derribadas.
+- **Persistencia:** guarda automáticamente los resultados de cada disparo en UGS y los recupera desde la interfaz, incluso después de cerrar y volver a abrir el simulador.
 
 ## Video
 
-https://youtu.be/esqKGpsQuRk
+[https://youtu.be/esqKGpsQuRk](https://youtu.be/rpDA-uI0alw)
