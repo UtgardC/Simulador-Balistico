@@ -44,4 +44,5 @@ El guardado y la consulta requieren conexión a Internet. Se utiliza autenticaci
 ## Video
 
 **Primer versión:** https://youtu.be/esqKGpsQuRk
+
 **Versión con persistencia de datos:** https://youtu.be/rpDA-uI0alw
