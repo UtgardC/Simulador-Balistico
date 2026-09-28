@@ -31,7 +31,7 @@ namespace Ballistics
         private FloatField massInput;
         private Toggle preserveVelocity;
         private Button fire, reset;
-        private Button savedShotsButton;
+        private Button savedShotsButton, localShotsButton;
         private Label liveTelemetry;
         private Label cloudStatus;
         private ScrollView history;
@@ -59,6 +59,7 @@ namespace Ballistics
             fire = root.Q<Button>("fire");
             reset = root.Q<Button>("reset");
             savedShotsButton = root.Q<Button>("saved-shots");
+            localShotsButton = root.Q<Button>("local-shots");
             liveTelemetry = root.Q<Label>("live-telemetry");
             cloudStatus = root.Q<Label>("cloud-status");
             history = root.Q<ScrollView>("history");
@@ -68,6 +69,7 @@ namespace Ballistics
             if (persistence == null)
                 persistence = session.gameObject.AddComponent<ShotPersistence>();
             savedHistory.style.display = DisplayStyle.None;
+            UpdateResultsTabs();
             SetCloudStatus(persistence.Status);
 
             EnsureCameraPivot();
@@ -97,7 +99,8 @@ namespace Ballistics
             cameraAngle.RegisterValueChangedCallback(OnCameraAngleChanged);
             fire.clicked += session.Fire;
             reset.clicked += session.ResetRange;
-            savedShotsButton.clicked += ToggleSavedShots;
+            savedShotsButton.clicked += ShowSavedShots;
+            localShotsButton.clicked += ShowLocalShots;
             session.Changed += Refresh;
             session.ImpactMarkersChanged += RefreshMarkerButtons;
             persistence.StatusChanged += SetCloudStatus;
@@ -119,7 +122,8 @@ namespace Ballistics
             persistence.StatusChanged -= SetCloudStatus;
             fire.clicked -= session.Fire;
             reset.clicked -= session.ResetRange;
-            savedShotsButton.clicked -= ToggleSavedShots;
+            savedShotsButton.clicked -= ShowSavedShots;
+            localShotsButton.clicked -= ShowLocalShots;
         }
 
         private void Update()
@@ -349,13 +353,25 @@ namespace Ballistics
             }
         }
 
-        private async void ToggleSavedShots()
+        private void ShowLocalShots()
         {
-            viewingSavedShots = !viewingSavedShots;
+            viewingSavedShots = false;
+            UpdateResultsTabs();
+        }
+
+        private void UpdateResultsTabs()
+        {
             history.style.display = viewingSavedShots ? DisplayStyle.None : DisplayStyle.Flex;
             savedHistory.style.display = viewingSavedShots ? DisplayStyle.Flex : DisplayStyle.None;
-            savedShotsButton.text = viewingSavedShots ? "VOLVER A TIROS" : "RESULTADOS GUARDADOS";
-            if (!viewingSavedShots || loadingSavedShots) return;
+            savedShotsButton.EnableInClassList("results-tab--active", viewingSavedShots);
+            localShotsButton.EnableInClassList("results-tab--active", !viewingSavedShots);
+        }
+
+        private async void ShowSavedShots()
+        {
+            viewingSavedShots = true;
+            UpdateResultsTabs();
+            if (loadingSavedShots) return;
 
             loadingSavedShots = true;
             savedHistory.Clear();

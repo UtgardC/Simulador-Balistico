@@ -20,11 +20,14 @@
                 <ui:Toggle name="preserve-velocity" text="Al cambiar masa: conservar impulso" class="preserve-switch"/>
             </ui:VisualElement>
             <ui:Button name="fire" text="DISPARAR  →" class="primary"/>
-            <ui:Button name="reset" text="NUEVO INTENTO"/>
+            <ui:Button name="reset" text="GUARDAR Y REINICIAR"/>
         </ui:VisualElement>
         <ui:VisualElement class="report-panel">
             <ui:Label name="live-telemetry" class="live-telemetry"/>
-            <ui:Button name="saved-shots" text="RESULTADOS GUARDADOS" class="saved-shots-button"/>
+            <ui:VisualElement class="results-tabs">
+                <ui:Button name="saved-shots" text="RESULTADOS GUARDADOS" class="results-tab"/>
+                <ui:Button name="local-shots" text="RESULTADOS LOCALES" class="results-tab results-tab--active"/>
+            </ui:VisualElement>
             <ui:Label name="cloud-status" class="cloud-status"/>
             <ui:ScrollView name="history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden"/>
             <ui:ScrollView name="saved-history" mode="Vertical" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" style="display: none;"/>

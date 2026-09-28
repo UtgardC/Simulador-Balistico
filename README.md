@@ -17,7 +17,7 @@ Abrir `Assets/Ballistics/Scenes/BallisticLab.unity` en Unity y presionar **Play*
 | Masa del proyectil | Permite elegir entre 0,1 y 50 kg con el slider o escribir un valor exacto. |
 | Conservar impulso / velocidad | Al cambiar la masa, decide cuál de los dos valores permanece fijo. El otro se ajusta según `velocidad = impulso / masa`. |
 | **Disparar** | Lanza el proyectil. |
-| **Nuevo intento** | Reconstruye los objetivos; también interrumpe un tiro en curso. |
+| **Guardar y reiniciar** | Reconstruye los objetivos. Si hay un tiro en curso, lo finaliza y registra su resultado antes de reiniciar. |
 
 El slider **Ángulo de cámara**, en la esquina inferior izquierda, gira la cámara entre 0° y 180°. Comienza en 67° y se puede mover durante el disparo.
 
@@ -29,7 +29,7 @@ Una esfera amarilla marca los impactos contra los bloques. En el registro, **Mos
 
 ## Resultados guardados en UGS
 
-Al finalizar cada disparo, el juego guarda en Unity Cloud Save el ángulo, impulso, masa, acierto, distancia y piezas derribadas. **Resultados guardados** recupera los tiros de la nube; **Volver a tiros** muestra otra vez el historial de la sesión. La distancia es horizontal, desde la boca de disparo hasta el impacto contra un bloque; si no hubo acierto, se usa el primer contacto o la posición final del proyectil.
+Al finalizar cada disparo, el juego guarda en Unity Cloud Save el ángulo, impulso, masa, acierto, distancia y piezas derribadas. **Resultados guardados** muestra los tiros recuperados de la nube; **Resultados locales** muestra los tiros de la sesión actual. La distancia es horizontal, desde la boca de disparo hasta el impacto contra un bloque; si no hubo acierto, se usa el primer contacto o la posición final del proyectil.
 
 Para activar Cloud Save, abrir **Edit → Project Settings → Services** y vincular este proyecto con un proyecto de Unity Gaming Services de tu cuenta. El juego inicia sesión anónimamente; los resultados se asocian a ese jugador. El estado del guardado o cualquier error de conexión aparece en el panel de resultados.
 
