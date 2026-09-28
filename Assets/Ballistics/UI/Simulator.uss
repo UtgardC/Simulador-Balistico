@@ -26,14 +26,16 @@ Button:hover { background-color: rgb(48, 73, 91); }
 Button.primary { background-color: rgb(104, 226, 192); color: rgb(12, 33, 38); -unity-font-style: bold; height: 34px; font-size: 12px; margin-top: 10px; }
 Button.primary:hover { background-color: rgb(149, 249, 220); }
 Button:disabled { opacity: 0.4; }
-.live-telemetry { height: 28px; padding-bottom: 8px; font-size: 12px; color: rgb(244, 193, 105); -unity-font-style: bold; border-bottom-width: 1px; border-bottom-color: rgb(47, 68, 83); }
-.results-tabs { flex-direction: row; margin-top: 7px; }
+.live-telemetry { height: 28px; flex-shrink: 0; padding-bottom: 8px; font-size: 12px; color: rgb(244, 193, 105); -unity-font-style: bold; border-bottom-width: 1px; border-bottom-color: rgb(47, 68, 83); }
+.results-tabs { flex-direction: row; height: 30px; flex-shrink: 0; margin-top: 7px; }
 .results-tab { flex-grow: 1; width: 50%; height: 30px; margin-top: 0; font-size: 10px; -unity-font-style: bold; }
 #saved-shots { margin-right: 4px; }
 .results-tab--active { background-color: rgb(52, 111, 101); border-color: rgb(106, 219, 193); color: rgb(240, 255, 250); }
 .results-tab--active:hover { background-color: rgb(61, 130, 117); }
-.cloud-status { margin-top: 5px; font-size: 10px; color: rgb(244, 193, 105); white-space: normal; }
-#history, #saved-history { flex-grow: 1; margin-top: 6px; }
+.cloud-status { flex-shrink: 0; margin-top: 5px; font-size: 10px; color: rgb(244, 193, 105); white-space: normal; }
+.empty-history { margin-top: 5px; font-size: 11px; color: rgb(158, 177, 194); white-space: normal; }
+/* Expanded shots scroll within the remaining space without compressing the header. */
+#history, #saved-history { flex-grow: 1; flex-basis: 0; min-height: 0; margin-top: 6px; }
 .shot-item { margin-bottom: 4px; border-bottom-width: 1px; border-bottom-color: rgb(38, 56, 70); overflow: hidden; }
 .shot-item > .unity-foldout__toggle { min-height: 25px; margin-left: 0; }
 .shot-item > .unity-foldout__toggle .unity-label { font-size: 12px; -unity-font-style: bold; color: rgb(229, 237, 244); white-space: normal; }

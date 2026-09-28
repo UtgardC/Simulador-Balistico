@@ -285,6 +285,13 @@ namespace Ballistics
             markerButtons.Clear();
             history.Clear();
 
+            if (session.ShotHistory.Count == 0 && !session.IsRunning)
+            {
+                var emptyMessage = new Label("Todavía no hay tiros locales.");
+                emptyMessage.AddToClassList("empty-history");
+                history.Add(emptyMessage);
+            }
+
             foreach (var shot in session.ShotHistory)
             {
                 var item = new Foldout { text = $"Tiro {shot.attempt}", value = false };
@@ -365,6 +372,7 @@ namespace Ballistics
             savedHistory.style.display = viewingSavedShots ? DisplayStyle.Flex : DisplayStyle.None;
             savedShotsButton.EnableInClassList("results-tab--active", viewingSavedShots);
             localShotsButton.EnableInClassList("results-tab--active", !viewingSavedShots);
+            UpdateCloudStatusVisibility();
         }
 
         private async void ShowSavedShots()
@@ -418,7 +426,14 @@ namespace Ballistics
         private void SetCloudStatus(string message)
         {
             cloudStatus.text = message;
-            cloudStatus.style.display = string.IsNullOrEmpty(message) ? DisplayStyle.None : DisplayStyle.Flex;
+            UpdateCloudStatusVisibility();
+        }
+
+        private void UpdateCloudStatusVisibility()
+        {
+            cloudStatus.style.display = viewingSavedShots && !string.IsNullOrEmpty(cloudStatus.text)
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
         }
     }
 }
